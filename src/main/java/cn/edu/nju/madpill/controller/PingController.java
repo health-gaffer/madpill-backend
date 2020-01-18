@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @createdAt 2020-01-17 20:09
  * @description
  **/
-
 @RestController
 public class PingController {
 
