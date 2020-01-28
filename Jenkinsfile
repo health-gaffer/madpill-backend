@@ -9,6 +9,22 @@ pipeline {
         stage('Test') {
             steps {
                 sh 'mvn clean test -Dmaven.test.failure.ignore=false'
+                junit '**/target/surefire-reports/*.xml'
+                stash includes: '**/target/jacoco.exec', name: 'jacoco'
+            }
+        }
+        stage('Sonar') {
+            when {
+                branch 'master'
+            }
+            environment {
+                SONAR_TOKEN = credentials('sonar-token')
+            }
+            steps {
+                unstash 'jacoco'
+
+                echo 'SonarQube analyze...'
+                sh "mvn sonar:sonar -Dsonar.projectKey=cn.edu.nju:madpill-backend -Dsonar.host.url=http://34.92.23.92:9000 -Dsonar.login=$SONAR_TOKEN -X"
             }
         }
         stage('Build') {
@@ -22,7 +38,8 @@ pipeline {
             }
             steps {
                 sshPublisher(
-                    continueOnError: false, failOnError: true,
+                    continueOnError: false,
+                    failOnError: true,
                     publishers: [
                         sshPublisherDesc(
                             configName: 'madpill',
