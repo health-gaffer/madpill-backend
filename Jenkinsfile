@@ -49,7 +49,7 @@ pipeline {
                             verbose: true,
                             transfers: [
                                 sshTransfer(
-                                    sourceFiles: "**/madpill-backend-0.0.1-SNAPSHOT.jar",
+                                    sourceFiles: "target/madpill-backend-0.0.1-SNAPSHOT.jar",
                                     removePrefix: "target",
                                 ),
                                 sshTransfer(
