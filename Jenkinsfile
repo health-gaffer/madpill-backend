@@ -54,7 +54,7 @@ pipeline {
                                 ),
                                 sshTransfer(
                                     sourceFiles: "**/deploy.sh",
-                                    execCommand: "cd /var/www/madpill/madpill-backend/ci && chmod 755 deploy.sh && bash deploy.sh"
+                                    execCommand: "cd /var/www/madpill/madpill-backend/ci && chmod 755 deploy.sh && export JASYPT_ENCRYPTOR_PASSWORD=$JASYPT_ENCRYPTOR_PASSWORD && bash deploy.sh"
                                 ),
                             ]
                         )
