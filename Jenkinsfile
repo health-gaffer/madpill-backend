@@ -24,7 +24,7 @@ pipeline {
                 unstash 'jacoco'
 
                 echo 'SonarQube analyze...'
-                sh "mvn sonar:sonar -Dsonar.projectKey=cn.edu.nju:madpill-backend -Dsonar.host.url=http://34.92.23.92:9000 -Dsonar.login=$SONAR_TOKEN -X"
+                sh "mvn sonar:sonar -Dproject.settings=sonar-project.properties -Dsonar.login=$SONAR_TOKEN -X"
             }
         }
         stage('Build') {
