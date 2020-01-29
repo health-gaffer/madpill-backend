@@ -36,6 +36,9 @@ pipeline {
             when {
                 branch 'master'
             }
+            environment {
+                JASYPT_ENCRYPTOR_PASSWORD = credentials('jasypt-encryptor-password')
+            }
             steps {
                 sshPublisher(
                     continueOnError: false,
