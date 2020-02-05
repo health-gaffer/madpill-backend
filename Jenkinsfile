@@ -15,7 +15,7 @@ pipeline {
         }
         stage('Sonar') {
             when {
-                branch 'master'
+                branch 'dev'
             }
             environment {
                 SONAR_TOKEN = credentials('sonar-token')
