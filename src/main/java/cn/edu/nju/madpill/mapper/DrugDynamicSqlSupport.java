@@ -1,11 +1,10 @@
 package cn.edu.nju.madpill.mapper;
 
-import org.mybatis.dynamic.sql.SqlColumn;
-import org.mybatis.dynamic.sql.SqlTable;
-
-import javax.annotation.Generated;
 import java.sql.JDBCType;
 import java.time.LocalDate;
+import javax.annotation.Generated;
+import org.mybatis.dynamic.sql.SqlColumn;
+import org.mybatis.dynamic.sql.SqlTable;
 
 public final class DrugDynamicSqlSupport {
     @Generated("org.mybatis.generator.api.MyBatisGenerator")

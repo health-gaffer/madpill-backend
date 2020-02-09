@@ -7,8 +7,11 @@ pipeline {
     }
     stages {
         stage('Test') {
+            environment {
+                JASYPT_ENCRYPTOR_PASSWORD = credentials('jasypt.encryptor.password')
+            }
             steps {
-                sh 'mvn clean test -Dmaven.test.failure.ignore=false'
+                sh 'mvn -Djasypt.encryptor.password=$JASYPT_ENCRYPTOR_PASSWORD -Dmaven.test.failure.ignore=false clean test'
                 junit '**/target/surefire-reports/*.xml'
                 stash includes: '**/target/jacoco.exec', name: 'jacoco'
             }

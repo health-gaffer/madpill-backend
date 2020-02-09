@@ -8,8 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Generated;
-
-import cn.edu.nju.madpill.dto.DrugBriefDTO;
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
