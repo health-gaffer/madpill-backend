@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Test') {
             environment {
-                JASYPT_ENCRYPTOR_PASSWORD = credentials('jasypt.encryptor.password')
+                JASYPT_ENCRYPTOR_PASSWORD = credentials('jasypt-encryptor-password')
             }
             steps {
                 sh 'mvn -Djasypt.encryptor.password=$JASYPT_ENCRYPTOR_PASSWORD -Dmaven.test.failure.ignore=false clean test'
