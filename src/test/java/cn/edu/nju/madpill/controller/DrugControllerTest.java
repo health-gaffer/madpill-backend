@@ -2,6 +2,8 @@ package cn.edu.nju.madpill.controller;
 
 import cn.edu.nju.madpill.dto.DrugDTO;
 import cn.edu.nju.madpill.service.DrugService;
+import jdk.nashorn.internal.runtime.logging.Logger;
+import lombok.extern.java.Log;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.annotation.MapperScan;
 import org.mybatis.spring.boot.test.autoconfigure.AutoConfigureMybatis;
@@ -15,6 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Log
 @WebMvcTest(DrugController.class)
 @AutoConfigureMybatis
 @MapperScan("cn.edu.nju.madpill.mapper")
