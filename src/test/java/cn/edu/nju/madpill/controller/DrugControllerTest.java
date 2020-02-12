@@ -2,7 +2,6 @@ package cn.edu.nju.madpill.controller;
 
 import cn.edu.nju.madpill.dto.DrugDTO;
 import cn.edu.nju.madpill.service.DrugService;
-import jdk.nashorn.internal.runtime.logging.Logger;
 import lombok.extern.java.Log;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.annotation.MapperScan;

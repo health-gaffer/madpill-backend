@@ -1,5 +1,6 @@
 package cn.edu.nju.madpill.controller;
 
+import cn.edu.nju.madpill.dto.DrugDTO;
 import cn.edu.nju.madpill.dto.Result;
 import cn.edu.nju.madpill.service.DrugService;
 import org.springframework.http.HttpStatus;
@@ -22,10 +23,35 @@ public class DrugController {
         this.drugService = drugService;
     }
 
+    @PutMapping(path = "")
+    public Result createNewDrug(@RequestBody DrugDTO drugDTO) {
+        drugService.createNewDrug(drugDTO);
+        return Result.builder()
+                .code(HttpStatus.OK.value())
+                .build();
+    }
+
     @GetMapping(path = "/{drugId}")
     public Result getDrugDetail(@PathVariable Long drugId) {
         return Result.builder()
                 .data(drugService.getDrugDetail(drugId))
+                .code(HttpStatus.OK.value())
+                .build();
+    }
+
+    @PutMapping(path = "/{drugId}")
+    public Result ModifyDrug(@RequestBody DrugDTO drugDTO, @PathVariable Long drugId) {
+        drugDTO.setId(drugId);
+        drugService.modifyDrug(drugDTO);
+        return Result.builder()
+                .code(HttpStatus.OK.value())
+                .build();
+    }
+
+    @DeleteMapping(path = "/{drugId}")
+    public Result deleteDrug(@PathVariable Long drugId) {
+        drugService.deleteDrug(drugId);
+        return Result.builder()
                 .code(HttpStatus.OK.value())
                 .build();
     }
