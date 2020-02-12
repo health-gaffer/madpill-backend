@@ -45,5 +45,4 @@ atlassian-ide-plugin.xml
 # Secret
 env.sh
 
-/src/
 /logs
