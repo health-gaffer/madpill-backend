@@ -5,8 +5,6 @@
 
 <generatorConfiguration>
 
-    <properties resource="application.yml"/>
-
     <context id="madpill" targetRuntime="MyBatis3DynamicSql">
 
         <!-- 注释 -->
@@ -20,7 +18,7 @@
                 driverClass="com.mysql.cj.jdbc.Driver"
                 connectionURL="jdbc:mysql://34.92.23.92:3306/madpill_test?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=CTT"
                 userId="madpill"
-                password="Madpill@402"
+                password="${mybatis.generator.jdbcPassword}"
         >
         </jdbcConnection>
 
