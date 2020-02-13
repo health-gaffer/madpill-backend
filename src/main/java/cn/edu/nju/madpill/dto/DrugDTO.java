@@ -29,10 +29,6 @@ public class DrugDTO {
 
     private LocalDate expireDate;
 
-    private Integer qualityPeriod;
-
-    private String qualityPeriodUnit;
-
     private String description;
 
     private String indication;

@@ -49,6 +49,9 @@ public class DrugService {
     public void createNewDrug(DrugDTO dto) throws BaseException {
         Drug newDrug = new Drug();
         modelMapper.map(dto, newDrug);
+
+        // TODO user_id
+        newDrug.setUserId(1L);
         drugMapper.insert(newDrug);
     }
 
@@ -56,7 +59,6 @@ public class DrugService {
         Drug drugInfo = drugMapper.selectByPrimaryKey(drugId).orElseThrow(ExceptionSuppliers.DRUG_NOT_FOUND);
         DrugDTO drugDTO = new DrugDTO();
         modelMapper.map(drugInfo, drugDTO);
-
 
         SelectStatementProvider selectStatement = select(tag.id, tag.name)
                 .from(drugTag)
@@ -79,10 +81,14 @@ public class DrugService {
     public void modifyDrug(DrugDTO dto) {
         Drug modifiedDrug = new Drug();
         modelMapper.map(dto, modifiedDrug);
+
+        // TODO user_id
+        modifiedDrug.setUserId(1L);
         drugMapper.updateByPrimaryKey(modifiedDrug);
     }
 
     public void deleteDrug(Long drugId) {
+        drugMapper.selectByPrimaryKey(drugId).orElseThrow(ExceptionSuppliers.DRUG_NOT_FOUND);
         drugMapper.deleteByPrimaryKey(drugId);
     }
 

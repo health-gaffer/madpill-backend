@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @EnableEncryptableProperties
-@MapperScan("cn.edu.nju.madpill.mapper")
+@MapperScan("cn.edu.nju.madpill.*mapper")
 public class MadpillBackendApplication {
 
     public static void main(String[] args) {

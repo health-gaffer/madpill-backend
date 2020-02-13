@@ -31,18 +31,19 @@ public class DrugController {
                 .build();
     }
 
-    @PutMapping(path = "")
-    public Result ModifyDrug(@RequestBody DrugDTO drugDTO) {
-        drugService.modifyDrug(drugDTO);
-        return Result.builder()
-                .code(HttpStatus.OK.value())
-                .build();
-    }
-
     @GetMapping(path = "/{drugId}")
     public Result getDrugDetail(@PathVariable Long drugId) {
         return Result.builder()
                 .data(drugService.getDrugDetail(drugId))
+                .code(HttpStatus.OK.value())
+                .build();
+    }
+
+    @PutMapping(path = "/{drugId}")
+    public Result ModifyDrug(@RequestBody DrugDTO drugDTO, @PathVariable Long drugId) {
+        drugDTO.setId(drugId);
+        drugService.modifyDrug(drugDTO);
+        return Result.builder()
                 .code(HttpStatus.OK.value())
                 .build();
     }
