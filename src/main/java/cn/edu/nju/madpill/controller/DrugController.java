@@ -23,9 +23,17 @@ public class DrugController {
         this.drugService = drugService;
     }
 
-    @PutMapping(path = "")
+    @PostMapping(path = "")
     public Result createNewDrug(@RequestBody DrugDTO drugDTO) {
         drugService.createNewDrug(drugDTO);
+        return Result.builder()
+                .code(HttpStatus.OK.value())
+                .build();
+    }
+
+    @PutMapping(path = "")
+    public Result ModifyDrug(@RequestBody DrugDTO drugDTO) {
+        drugService.modifyDrug(drugDTO);
         return Result.builder()
                 .code(HttpStatus.OK.value())
                 .build();
@@ -35,15 +43,6 @@ public class DrugController {
     public Result getDrugDetail(@PathVariable Long drugId) {
         return Result.builder()
                 .data(drugService.getDrugDetail(drugId))
-                .code(HttpStatus.OK.value())
-                .build();
-    }
-
-    @PutMapping(path = "/{drugId}")
-    public Result ModifyDrug(@RequestBody DrugDTO drugDTO, @PathVariable Long drugId) {
-        drugDTO.setId(drugId);
-        drugService.modifyDrug(drugDTO);
-        return Result.builder()
                 .code(HttpStatus.OK.value())
                 .build();
     }
