@@ -51,6 +51,6 @@
         <table tableName="user" domainObjectName="User"/>
         <table tableName="tag" domainObjectName="Tag"/>
         <table tableName="drug_tag" domainObjectName="DrugTag"/>
-        <table tableName="warehouse" domainObjectName="SearchingDrug"/>
+        <table tableName="warehouse" domainObjectName="Warehouse"/>
     </context>
 </generatorConfiguration>
