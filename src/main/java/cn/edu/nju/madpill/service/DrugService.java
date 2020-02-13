@@ -1,5 +1,6 @@
 package cn.edu.nju.madpill.service;
 
+import cn.edu.nju.madpill.custommapper.AssistantMapper;
 import cn.edu.nju.madpill.domain.Drug;
 import cn.edu.nju.madpill.domain.Tag;
 import cn.edu.nju.madpill.dto.DrugBriefDTO;
@@ -7,7 +8,6 @@ import cn.edu.nju.madpill.dto.DrugDTO;
 import cn.edu.nju.madpill.dto.TagDTO;
 import cn.edu.nju.madpill.exception.BaseException;
 import cn.edu.nju.madpill.exception.ExceptionSuppliers;
-import cn.edu.nju.madpill.mapper.AssistantMapper;
 import cn.edu.nju.madpill.mapper.DrugMapper;
 import cn.edu.nju.madpill.mapper.TagMapper;
 import org.modelmapper.ModelMapper;
@@ -99,6 +99,6 @@ public class DrugService {
                 .build()
                 .render(RenderingStrategies.MYBATIS3);
 
-        return assistantMapper.selectBlogs(drugsSelectStatement);
+        return assistantMapper.selectDrugs(drugsSelectStatement);
     }
 }

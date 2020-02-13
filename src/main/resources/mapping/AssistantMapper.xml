@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.edu.nju.madpill.mapper.AssistantMapper">
+<mapper namespace="cn.edu.nju.madpill.custommapper.AssistantMapper">
     <resultMap id="DrugBrief" type="DrugBriefDTO">
         <id property="id" jdbcType="BIGINT" column="drug_id"/>
         <result property="name" jdbcType="VARCHAR" column="drug_name"/>
