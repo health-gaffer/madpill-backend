@@ -28,7 +28,8 @@ public class WarehouseControllerIntegrationTest {
     @Test
     void test() throws Exception {
         mockMvc.perform(
-                get("/warehouse?query=奥")
+                get("/warehouse")
+                        .param("query", "奥")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
