@@ -11,4 +11,5 @@ import java.util.function.Supplier;
  */
 public class ExceptionSuppliers {
     public static final Supplier<BaseException> DRUG_NOT_FOUND = () -> new BaseException("找不到相应的药品", 404);
+    public static final Supplier<BaseException> WAREHOUSE_NOT_FOUND = () -> new BaseException("找不到相应的仓库药品", 404);
 }

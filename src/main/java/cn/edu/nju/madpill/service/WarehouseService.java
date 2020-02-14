@@ -1,7 +1,9 @@
 package cn.edu.nju.madpill.service;
 
 import cn.edu.nju.madpill.domain.Warehouse;
+import cn.edu.nju.madpill.dto.WarehouseBriefDTO;
 import cn.edu.nju.madpill.dto.WarehouseDTO;
+import cn.edu.nju.madpill.exception.ExceptionSuppliers;
 import cn.edu.nju.madpill.mapper.WarehouseMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,14 @@ public class WarehouseService {
         this.modelMapper = modelMapper;
     }
 
-    public List<WarehouseDTO> getWarehouses(String query, long start) {
+    public WarehouseDTO getWarehouse(Long warehouseId) {
+        Warehouse warehouse = warehouseMapper.selectByPrimaryKey(warehouseId).orElseThrow(ExceptionSuppliers.WAREHOUSE_NOT_FOUND);
+        WarehouseDTO dto = new WarehouseDTO();
+        modelMapper.map(warehouse, dto);
+        return dto;
+    }
+
+    public List<WarehouseBriefDTO> getWarehouses(String query, long start) {
         final String queryStr = "%" + query + "%";
         List<Warehouse> warehouses = warehouseMapper.select(
                 c -> c.where(name, isLike(queryStr))
@@ -42,7 +51,7 @@ public class WarehouseService {
                         .offset(start)
         );
         return warehouses.stream().map(warehouse -> {
-            WarehouseDTO dto = new WarehouseDTO();
+            WarehouseBriefDTO dto = new WarehouseBriefDTO();
             modelMapper.map(warehouse, dto);
             return dto;
         }).collect(Collectors.toList());

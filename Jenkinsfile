@@ -7,6 +7,9 @@ pipeline {
     }
     stages {
         stage('Test') {
+            options {
+                retry(2)
+            }
             environment {
                 JASYPT_ENCRYPTOR_PASSWORD = credentials('jasypt-encryptor-password')
                 MYBATIS_GENERATOR_JDBC_PASSWORD = credentials('mybatis-generator-jdbcPassword')

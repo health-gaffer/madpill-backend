@@ -50,7 +50,7 @@ public class DrugService {
         Drug newDrug = new Drug();
         modelMapper.map(dto, newDrug);
 
-        // TODO user_id
+        // TODO user_id tags
         newDrug.setUserId(1L);
         drugMapper.insert(newDrug);
     }
@@ -82,7 +82,7 @@ public class DrugService {
         Drug modifiedDrug = new Drug();
         modelMapper.map(dto, modifiedDrug);
 
-        // TODO user_id
+        // TODO user_id tags
         modifiedDrug.setUserId(1L);
         drugMapper.updateByPrimaryKey(modifiedDrug);
     }

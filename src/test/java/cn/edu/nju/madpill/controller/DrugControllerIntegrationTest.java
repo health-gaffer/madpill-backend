@@ -36,7 +36,7 @@ public class DrugControllerIntegrationTest {
     @Order(1)
     void addDrug() throws Exception {
         // 新增
-        dto.setId(100000000L);
+        dto.setId(1L);
         mockMvc.perform(
                 post("/drugs")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -49,17 +49,17 @@ public class DrugControllerIntegrationTest {
     @Order(2)
     void modifyDrug() throws Exception {
         // 修改
-        dto.setName("测试药品100000000");
+        dto.setName("测试药品1修改");
         mockMvc.perform(
-                put("/drugs/100000000")
+                put("/drugs/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JSON.toJSONString(dto)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/drugs/100000000"))
+        mockMvc.perform(get("/drugs/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists())
-                .andExpect(jsonPath("$.data.name").value("测试药品100000000"));
+                .andExpect(jsonPath("$.data.name").value("测试药品1修改"));
     }
 
     @Test
@@ -68,14 +68,14 @@ public class DrugControllerIntegrationTest {
 
         // 删除
         mockMvc.perform(
-                delete("/drugs/100000000")
+                delete("/drugs/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
         mockMvc.perform(
-                delete("/drugs/100000000000")
+                delete("/drugs/10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -84,12 +84,12 @@ public class DrugControllerIntegrationTest {
 
     private DrugDTO getDto() {
         return DrugDTO.builder()
-                .name("测试药品3")
+                .name("测试药品1")
                 .producedDate(LocalDate.of(2019, 4, 7))
                 .expireDate(LocalDate.now())
-                .description("测试说明文字3")
-                .indication("测试适用症3")
-                .contraindication("测试禁忌3")
+                .description("测试说明文字1")
+                .indication("测试适用症1")
+                .contraindication("测试禁忌1")
                 .build();
     }
 
