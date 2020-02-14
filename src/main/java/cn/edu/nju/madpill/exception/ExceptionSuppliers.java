@@ -1,5 +1,7 @@
 package cn.edu.nju.madpill.exception;
 
+import lombok.experimental.UtilityClass;
+
 import java.util.function.Supplier;
 
 /**
@@ -9,6 +11,7 @@ import java.util.function.Supplier;
  * @author Shenmiu
  * @date 2020/2/6
  */
+@UtilityClass
 public class ExceptionSuppliers {
     public static final Supplier<BaseException> DRUG_NOT_FOUND = () -> new BaseException("找不到相应的药品", 404);
     public static final Supplier<BaseException> TAG_NOT_FOUND = () -> new BaseException("找不到相关标签", 404);

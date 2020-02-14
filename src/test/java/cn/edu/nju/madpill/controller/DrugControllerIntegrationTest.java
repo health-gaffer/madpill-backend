@@ -6,7 +6,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureJsonTesters
-@MapperScan("cn.edu.nju.madpill.*mapper")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DrugControllerIntegrationTest {
 
@@ -52,6 +50,16 @@ public class DrugControllerIntegrationTest {
 
     @Test
     @Order(2)
+    void testGetDrugDetail() throws Exception {
+        mockMvc.perform(get("/drugs/" + 100000000))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data.id").value(100000000));
+    }
+
+
+    @Test
+    @Order(3)
     void modifyDrug() throws Exception {
         // 修改
         dto.setName("测试药品100000000");
@@ -68,7 +76,7 @@ public class DrugControllerIntegrationTest {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void deleteDrug() throws Exception {
 
         // 删除
