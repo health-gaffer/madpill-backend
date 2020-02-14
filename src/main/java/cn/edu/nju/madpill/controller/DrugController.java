@@ -40,7 +40,7 @@ public class DrugController {
     }
 
     @PutMapping(path = "/{drugId}")
-    public Result ModifyDrug(@RequestBody DrugDTO drugDTO, @PathVariable Long drugId) {
+    public Result modifyDrug(@RequestBody DrugDTO drugDTO, @PathVariable Long drugId) {
         drugDTO.setId(drugId);
         drugService.modifyDrug(drugDTO);
         return Result.builder()

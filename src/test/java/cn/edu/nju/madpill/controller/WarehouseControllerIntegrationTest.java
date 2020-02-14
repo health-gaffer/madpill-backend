@@ -18,7 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Log
 @SpringBootTest
 @AutoConfigureMockMvc
-@ExtendWith(SpringExtension.class)
 @MapperScan("cn.edu.nju.madpill.*mapper")
 public class WarehouseControllerIntegrationTest {
 
