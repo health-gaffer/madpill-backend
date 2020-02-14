@@ -1,51 +1,54 @@
 package cn.edu.nju.madpill.controller;
 
-import cn.edu.nju.madpill.dto.DrugDTO;
 import cn.edu.nju.madpill.dto.TagDTO;
-import cn.edu.nju.madpill.service.DrugService;
-import cn.edu.nju.madpill.service.TagService;
-import com.alibaba.fastjson.JSON;
 import lombok.extern.java.Log;
-import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDate;
-
-import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @Log
 @SpringBootTest
 @AutoConfigureMockMvc
-@ExtendWith(SpringExtension.class)
+@AutoConfigureJsonTesters
 @MapperScan("cn.edu.nju.madpill.*mapper")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TagControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private JacksonTester<TagDTO> json;
 
     @Test
-    void test() throws Exception {
+    @Order(1)
+    void testAddTag() throws Exception {
         // 新增
         TagDTO dto = TagDTO.builder().id(110L).name("感冒").userId(111L).build();
 
         mockMvc.perform(put("/tags")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(JSON.toJSONString(dto)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.write(dto).getJson()))
                 .andExpect(status().isOk());
+    }
 
+    @Test
+    @Order(2)
+    void testGetTag() throws Exception {
         // 获得标签
         mockMvc.perform(
                 get("/tags/user?userId=111"))
@@ -53,12 +56,15 @@ public class TagControllerTest {
                 .andExpect(jsonPath("$.data").exists())
                 .andExpect(jsonPath("$.data[0].id").value(110))
                 .andExpect(jsonPath("$.code").value(200));
+    }
 
+    @Test
+    @Order(3)
+    void testDeleteTag() throws Exception {
         // 删除
         mockMvc.perform(
                 delete("/tags/110"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
-
     }
 }

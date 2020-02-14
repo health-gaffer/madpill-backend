@@ -1,5 +1,6 @@
 package cn.edu.nju.madpill.controller;
 
+import cn.edu.nju.madpill.dto.PageRequest;
 import cn.edu.nju.madpill.dto.Result;
 import cn.edu.nju.madpill.service.WarehouseService;
 import org.springframework.http.HttpStatus;
@@ -26,9 +27,18 @@ public class WarehouseController {
     }
 
     @GetMapping(params = {"query"})
-    public Result search(@RequestParam("query") String query) {
+    public Result search(@RequestParam("query") String query,
+                         @RequestParam(name = "page", required = false, defaultValue = "1") int page,
+                         @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize,
+                         // url 中 sort 的参数格式为 sort=field1.desc,field2.asc，field 为数据库中的字段
+                         @RequestParam(name = "sort", required = false, defaultValue = "name.asc") String sort) {
+        PageRequest pageRequest = PageRequest.builder()
+                .page(page)
+                .pageSize(pageSize)
+                .sort(sort)
+                .build();
         return Result.builder()
-                .data(warehouseService.getWarehouses(query))
+                .data(warehouseService.getWarehouses(query, pageRequest))
                 .code(HttpStatus.OK.value())
                 .build();
     }

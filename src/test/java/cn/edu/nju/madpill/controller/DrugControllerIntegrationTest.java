@@ -1,7 +1,6 @@
 package cn.edu.nju.madpill.controller;
 
 import cn.edu.nju.madpill.dto.DrugDTO;
-import com.alibaba.fastjson.JSON;
 import lombok.extern.java.Log;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -9,8 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Log
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureJsonTesters
 @MapperScan("cn.edu.nju.madpill.*mapper")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DrugControllerIntegrationTest {
@@ -32,6 +34,9 @@ public class DrugControllerIntegrationTest {
 
     private DrugDTO dto = getDto();
 
+    @Autowired
+    private JacksonTester<DrugDTO> json;
+
     @Test
     @Order(1)
     void addDrug() throws Exception {
@@ -40,7 +45,7 @@ public class DrugControllerIntegrationTest {
         mockMvc.perform(
                 post("/drugs")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JSON.toJSONString(dto)))
+                        .content(json.write(dto).getJson()))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -53,7 +58,7 @@ public class DrugControllerIntegrationTest {
         mockMvc.perform(
                 put("/drugs/100000000")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JSON.toJSONString(dto)))
+                        .content(json.write(dto).getJson()))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/drugs/100000000"))

@@ -1,8 +1,11 @@
 package cn.edu.nju.madpill.service;
 
 import cn.edu.nju.madpill.domain.Warehouse;
+import cn.edu.nju.madpill.dto.PageRequest;
 import cn.edu.nju.madpill.dto.WarehouseDTO;
 import cn.edu.nju.madpill.mapper.WarehouseMapper;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -30,14 +33,18 @@ public class WarehouseService {
         this.modelMapper = modelMapper;
     }
 
-    public List<WarehouseDTO> getWarehouses(String query) {
+    public PageInfo<WarehouseDTO> getWarehouses(String query, PageRequest pageRequest) {
         final String queryStr = "%" + query + "%";
+        // 在你需要进行分页的 MyBatis 查询方法前调用 PageHelper.startPage 静态方法即可
+        // 紧跟在这个方法后的第一个MyBatis 查询方法会被进行分页。
+        PageHelper.startPage(pageRequest.getPage(), pageRequest.getPageSize(), pageRequest.getSort());
         List<Warehouse> warehouses = warehouseMapper.select(c -> c.where(name, isLike(queryStr)));
-        return warehouses.stream().map(warehouse -> {
+        List<WarehouseDTO> dtoList = warehouses.stream().map(warehouse -> {
             WarehouseDTO dto = new WarehouseDTO();
             modelMapper.map(warehouse, dto);
             return dto;
         }).collect(Collectors.toList());
+        return PageInfo.of(dtoList);
     }
 
 }
