@@ -7,9 +7,11 @@ import cn.edu.nju.madpill.dto.DrugBriefDTO;
 import cn.edu.nju.madpill.dto.DrugDTO;
 import cn.edu.nju.madpill.dto.TagDTO;
 import cn.edu.nju.madpill.exception.BaseException;
+import cn.edu.nju.madpill.exception.ExceptionSuppliers;
 import cn.edu.nju.madpill.mapper.DrugTagMapper;
 import cn.edu.nju.madpill.mapper.TagMapper;
 import com.mysql.cj.xdevapi.UpdateStatement;
+import org.modelmapper.ModelMapper;
 import org.mybatis.dynamic.sql.delete.render.DeleteStatementProvider;
 import org.mybatis.dynamic.sql.render.RenderingStrategy;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
@@ -37,19 +39,13 @@ public class TagService {
     private final DrugTagMapper drugTagMapper;
     private final TagMapper tagMapper;
     private final AssistantMapper assistantMapper;
+    private final ModelMapper modelMapper;
 
-    public TagService(DrugTagMapper drugTagMapper, TagMapper tagMapper, AssistantMapper assistantMapper) {
+    public TagService(DrugTagMapper drugTagMapper, TagMapper tagMapper, AssistantMapper assistantMapper, ModelMapper modelMapper) {
         this.drugTagMapper = drugTagMapper;
         this.tagMapper = tagMapper;
         this.assistantMapper = assistantMapper;
-    }
-
-    public DrugDTO getDrugDetail(Long drugId) throws BaseException {
-        return null;
-    }
-
-    public List<DrugBriefDTO> getUserDrugs(Long userId) throws BaseException {
-        return null;
+        this.modelMapper = modelMapper;
     }
 
     public List<TagDTO> getTagsOfUser(Long userId) {
@@ -67,34 +63,33 @@ public class TagService {
         return tagDTOS;
     }
 
-    public int deleteTag(Long userId, Long tagId) {
+    public void deleteTag(Long tagId) {
         DeleteStatementProvider deleteStatement = deleteFrom(drugTag)
                 .where(drugTag.tagId, isEqualTo(tagId)).build()
                 .render(RenderingStrategy.MYBATIS3);
-        int result = drugTagMapper.delete(deleteStatement);
-        tagMapper.deleteByPrimaryKey(tagId);
-        return result;
-    }
-
-    public int addNewTag(Long userId, String name) {
-        Tag tag = new Tag();
-        tag.setName(name);
-        tag.setUserId(userId);
-        return tagMapper.insert(tag);
-    }
-
-    public int updateTagsOfDrug(Long drugId, Long[] tagIds) {
-        DeleteStatementProvider deleteStatement = deleteFrom(drugTag)
-                .where(drugTag.drugId, isEqualTo(drugId)).build()
-                .render(RenderingStrategy.MYBATIS3);
+        tagMapper.selectByPrimaryKey(tagId).orElseThrow(ExceptionSuppliers.TAG_NOT_FOUND);
         drugTagMapper.delete(deleteStatement);
-        List<DrugTag> drugTags = new ArrayList<>();
-        for (Long tadId :tagIds){
-            DrugTag drugTag = new DrugTag();
-            drugTag.setDrugId(drugId);
-            drugTag.setTagId(tadId);
-            drugTags.add(drugTag);
-        }
-        return drugTagMapper.insertMultiple(drugTags);
+        tagMapper.deleteByPrimaryKey(tagId);
     }
+
+    public void addNewTag(TagDTO dto) {
+        Tag tag = new Tag();
+        modelMapper.map(dto, tag);
+        tagMapper.insert(tag);
+    }
+
+//    public int updateTagsOfDrug(Long drugId, Long[] tagIds) {
+//        DeleteStatementProvider deleteStatement = deleteFrom(drugTag)
+//                .where(drugTag.drugId, isEqualTo(drugId)).build()
+//                .render(RenderingStrategy.MYBATIS3);
+//        drugTagMapper.delete(deleteStatement);
+//        List<DrugTag> drugTags = new ArrayList<>();
+//        for (Long tadId :tagIds){
+//            DrugTag drugTag = new DrugTag();
+//            drugTag.setDrugId(drugId);
+//            drugTag.setTagId(tadId);
+//            drugTags.add(drugTag);
+//        }
+//        return drugTagMapper.insertMultiple(drugTags);
+//    }
 }

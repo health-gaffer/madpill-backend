@@ -1,6 +1,7 @@
 package cn.edu.nju.madpill.controller;
 
 import cn.edu.nju.madpill.dto.Result;
+import cn.edu.nju.madpill.dto.TagDTO;
 import cn.edu.nju.madpill.service.DrugService;
 import cn.edu.nju.madpill.service.TagService;
 import org.springframework.http.HttpStatus;
@@ -25,34 +26,35 @@ public class TagController {
 
     @GetMapping(path = "/user")
     public Result getTagsOfUser(@RequestParam("userId") Long userId) {
+        tagService.getTagsOfUser(userId);
         return Result.builder()
                 .data(tagService.getTagsOfUser(userId))
                 .code(HttpStatus.OK.value())
                 .build();
     }
 
-    @GetMapping(path = "/remove")
-    public Result deleteTag(@RequestParam("userId") Long userId, @RequestParam("tagId") Long tagId) {
+    @DeleteMapping(path = "/{tagId}")
+    public Result deleteTag(@PathVariable("tagId") Long tagId) {
+        tagService.deleteTag(tagId);
         return Result.builder()
-                .data(tagService.deleteTag(userId, tagId))
                 .code(HttpStatus.OK.value())
                 .build();
     }
 
-    @GetMapping(path = "/add")
-    public Result getTagsOfDrug(@RequestParam("userId") Long userId, @RequestParam("name") String name) {
+    @PutMapping(path = "")
+    public Result addNewTag(@RequestBody TagDTO tagDTO) {
+        tagService.addNewTag(tagDTO);
         return Result.builder()
-                .data(tagService.addNewTag(userId, name))
                 .code(HttpStatus.OK.value())
                 .build();
     }
 
 
-    @GetMapping(params = "/updateDrugTag")
-    public Result updateTagsOfDrug(@RequestParam("drugId") Long drugId, @RequestParam("drugId") Long[] tagIds) {
-        return Result.builder()
-                .data(tagService.updateTagsOfDrug(drugId,tagIds))
-                .code(HttpStatus.OK.value())
-                .build();
-    }
+//    @PostMapping(params = "/updateDrugTag")
+//    public Result updateTagsOfDrug(@RequestParam("drugId") Long drugId, @RequestParam("drugId") Long[] tagIds) {
+//        return Result.builder()
+//                .data(tagService.updateTagsOfDrug(drugId,tagIds))
+//                .code(HttpStatus.OK.value())
+//                .build();
+//    }
 }
