@@ -25,10 +25,11 @@ public class WarehouseController {
         this.warehouseService = warehouseService;
     }
 
-    @GetMapping(params = {"query"})
-    public Result search(@RequestParam("query") String query) {
+    @GetMapping(path = "")
+    public Result search(@RequestParam("query") String query,
+                         @RequestParam(name = "start", defaultValue = "0") long start) {
         return Result.builder()
-                .data(warehouseService.getWarehouses(query))
+                .data(warehouseService.getWarehouses(query, start))
                 .code(HttpStatus.OK.value())
                 .build();
     }

@@ -22,8 +22,4 @@ public class WarehouseDTO {
     private String name;
 
     private String manufacture;
-
-    private String indication;
-
-    private String contraindication;
 }

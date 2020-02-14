@@ -25,7 +25,7 @@ public class WarehouseControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    void test() throws Exception {
+    void testExist() throws Exception {
         mockMvc.perform(
                 get("/warehouse")
                         .param("query", "奥")
@@ -36,6 +36,18 @@ public class WarehouseControllerIntegrationTest {
                 .andExpect(jsonPath("$.data[1].name").value("奥2"))
                 .andExpect(jsonPath("$.data[2].name").value("奥3"))
                 .andExpect(jsonPath("$.data[3].name").value("charles奥4"));
+    }
+
+    @Test
+    void testNotExist() throws Exception {
+        mockMvc.perform(
+                get("/warehouse")
+                        .param("query", "奥")
+                        .param("start", "20")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].name").doesNotExist());
     }
 
 }
