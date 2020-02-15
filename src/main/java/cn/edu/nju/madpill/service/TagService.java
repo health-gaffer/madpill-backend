@@ -72,10 +72,17 @@ public class TagService {
         tagMapper.deleteByPrimaryKey(tagId);
     }
 
-    public void addNewTag(TagDTO dto) {
-        Tag tag = new Tag();
-        modelMapper.map(dto, tag);
-        tagMapper.insert(tag);
+    public Long addNewTag(TagDTO dto) {
+        Tag newTag = new Tag();
+        modelMapper.map(dto, newTag);
+        tagMapper.insert(newTag);
+        SelectStatementProvider tagSelectStatement = select(tag.id)
+                .from(tag)
+                .where(tag.name, isEqualTo(dto.getName()))
+                .and(tag.userId, isEqualTo(dto.getUserId()))
+                .build()
+                .render(RenderingStrategy.MYBATIS3);
+        return tagMapper.selectMany(tagSelectStatement).get(0).getId();
     }
 
 //    public int updateTagsOfDrug(Long drugId, Long[] tagIds) {

@@ -43,7 +43,9 @@ public class TagControllerTest {
         mockMvc.perform(put("/tags")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.write(dto).getJson()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.code").value(200));
     }
 
     @Test

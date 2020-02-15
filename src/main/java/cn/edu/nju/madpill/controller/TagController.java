@@ -43,8 +43,8 @@ public class TagController {
 
     @PutMapping(path = "")
     public Result addNewTag(@RequestBody TagDTO tagDTO) {
-        tagService.addNewTag(tagDTO);
         return Result.builder()
+                .data(tagService.addNewTag(tagDTO))
                 .code(HttpStatus.OK.value())
                 .build();
     }
