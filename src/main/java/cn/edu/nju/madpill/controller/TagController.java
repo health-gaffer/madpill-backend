@@ -25,7 +25,6 @@ public class TagController {
 
     @GetMapping(path = "/user")
     public Result getTagsOfUser(@RequestParam("userId") Long userId) {
-        tagService.getTagsOfUser(userId);
         return Result.builder()
                 .data(tagService.getTagsOfUser(userId))
                 .code(HttpStatus.OK.value())

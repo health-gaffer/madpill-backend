@@ -46,12 +46,11 @@ public class TagService {
                 .build()
                 .render(RenderingStrategies.MYBATIS3);
         List<Tag> tags = tagMapper.selectMany(tagSelectStatement);
-        List<TagDTO> tagDTOS = tags.stream().map(tag -> TagDTO.builder()
-                .id(tag.getId())
-                .name(tag.getName())
-                .build())
-                .collect(Collectors.toList());
-        return tagDTOS;
+        return tags.stream().map(tag -> {
+            TagDTO dto = new TagDTO();
+            modelMapper.map(tag, dto);
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class)
