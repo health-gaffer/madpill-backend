@@ -6,6 +6,7 @@ import cn.edu.nju.madpill.dto.Result;
 import cn.edu.nju.madpill.service.UserService;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -28,16 +29,19 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(value = "/")
+    @PostMapping(value = "")
     @ResponseBody
-    public Result login(String code){
+    public Result login(@RequestBody String code){
         try {
             WxMaJscode2SessionResult sessionResult = wxMaService.getUserService().getSessionInfo(code);
             String openId = sessionResult.getOpenid();
+            userService.addUserIfAbsent(openId);
         } catch (WxErrorException e) {
             e.printStackTrace();
         }
-        return new Result();
+        return Result.builder()
+                .code(HttpStatus.OK.value())
+                .build();
     }
 
 }
