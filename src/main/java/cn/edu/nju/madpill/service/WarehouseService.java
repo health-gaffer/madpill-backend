@@ -1,11 +1,10 @@
 package cn.edu.nju.madpill.service;
 
 import cn.edu.nju.madpill.domain.Warehouse;
-import cn.edu.nju.madpill.dto.PageRequest;
+import cn.edu.nju.madpill.dto.WarehouseBriefDTO;
 import cn.edu.nju.madpill.dto.WarehouseDTO;
+import cn.edu.nju.madpill.exception.ExceptionSuppliers;
 import cn.edu.nju.madpill.mapper.WarehouseMapper;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +24,10 @@ import static org.mybatis.dynamic.sql.SqlBuilder.isLike;
 @Service
 public class WarehouseService {
 
+    /**
+     * 每次请求仓库药品时的数量
+     */
+    private static final int WAREHOUSE_NUM_PER_REQUEST = 10;
     private final WarehouseMapper warehouseMapper;
     private final ModelMapper modelMapper;
 
@@ -33,18 +36,25 @@ public class WarehouseService {
         this.modelMapper = modelMapper;
     }
 
-    public PageInfo<WarehouseDTO> getWarehouses(String query, PageRequest pageRequest) {
+    public WarehouseDTO getWarehouse(Long warehouseId) {
+        Warehouse warehouse = warehouseMapper.selectByPrimaryKey(warehouseId).orElseThrow(ExceptionSuppliers.WAREHOUSE_NOT_FOUND);
+        WarehouseDTO dto = new WarehouseDTO();
+        modelMapper.map(warehouse, dto);
+        return dto;
+    }
+
+    public List<WarehouseBriefDTO> getWarehouses(String query, long start) {
         final String queryStr = "%" + query + "%";
-        // 在你需要进行分页的 MyBatis 查询方法前调用 PageHelper.startPage 静态方法即可
-        // 紧跟在这个方法后的第一个MyBatis 查询方法会被进行分页。
-        PageHelper.startPage(pageRequest.getPage(), pageRequest.getPageSize(), pageRequest.getSort());
-        List<Warehouse> warehouses = warehouseMapper.select(c -> c.where(name, isLike(queryStr)));
-        List<WarehouseDTO> dtoList = warehouses.stream().map(warehouse -> {
-            WarehouseDTO dto = new WarehouseDTO();
+        List<Warehouse> warehouses = warehouseMapper.select(
+                c -> c.where(name, isLike(queryStr))
+                        .limit(WAREHOUSE_NUM_PER_REQUEST)
+                        .offset(start)
+        );
+        return warehouses.stream().map(warehouse -> {
+            WarehouseBriefDTO dto = new WarehouseBriefDTO();
             modelMapper.map(warehouse, dto);
             return dto;
         }).collect(Collectors.toList());
-        return PageInfo.of(dtoList);
     }
 
 }

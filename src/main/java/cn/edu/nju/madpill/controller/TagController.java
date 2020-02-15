@@ -2,7 +2,6 @@ package cn.edu.nju.madpill.controller;
 
 import cn.edu.nju.madpill.dto.Result;
 import cn.edu.nju.madpill.dto.TagDTO;
-import cn.edu.nju.madpill.service.DrugService;
 import cn.edu.nju.madpill.service.TagService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

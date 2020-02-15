@@ -1,24 +1,17 @@
 package cn.edu.nju.madpill.service;
 
-import cn.edu.nju.madpill.custommapper.AssistantMapper;
-import cn.edu.nju.madpill.domain.DrugTag;
 import cn.edu.nju.madpill.domain.Tag;
-import cn.edu.nju.madpill.dto.DrugBriefDTO;
-import cn.edu.nju.madpill.dto.DrugDTO;
 import cn.edu.nju.madpill.dto.TagDTO;
-import cn.edu.nju.madpill.exception.BaseException;
 import cn.edu.nju.madpill.exception.ExceptionSuppliers;
 import cn.edu.nju.madpill.mapper.DrugTagMapper;
 import cn.edu.nju.madpill.mapper.TagMapper;
-import com.mysql.cj.xdevapi.UpdateStatement;
 import org.modelmapper.ModelMapper;
 import org.mybatis.dynamic.sql.delete.render.DeleteStatementProvider;
-import org.mybatis.dynamic.sql.render.RenderingStrategy;
+import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
-import org.mybatis.dynamic.sql.update.render.UpdateStatementProvider;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,22 +31,20 @@ public class TagService {
 
     private final DrugTagMapper drugTagMapper;
     private final TagMapper tagMapper;
-    private final AssistantMapper assistantMapper;
     private final ModelMapper modelMapper;
 
-    public TagService(DrugTagMapper drugTagMapper, TagMapper tagMapper, AssistantMapper assistantMapper, ModelMapper modelMapper) {
+    public TagService(DrugTagMapper drugTagMapper, TagMapper tagMapper, ModelMapper modelMapper) {
         this.drugTagMapper = drugTagMapper;
         this.tagMapper = tagMapper;
-        this.assistantMapper = assistantMapper;
         this.modelMapper = modelMapper;
     }
 
     public List<TagDTO> getTagsOfUser(Long userId) {
-        SelectStatementProvider tagSelectStatement = select(tag.id,tag.name)
+        SelectStatementProvider tagSelectStatement = select(tag.id, tag.name)
                 .from(tag)
                 .where(tag.userId, isEqualTo(userId))
                 .build()
-                .render(RenderingStrategy.MYBATIS3);
+                .render(RenderingStrategies.MYBATIS3);
         List<Tag> tags = tagMapper.selectMany(tagSelectStatement);
         List<TagDTO> tagDTOS = tags.stream().map(tag -> TagDTO.builder()
                 .id(tag.getId())
@@ -63,15 +54,19 @@ public class TagService {
         return tagDTOS;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void deleteTag(Long tagId) {
         DeleteStatementProvider deleteStatement = deleteFrom(drugTag)
                 .where(drugTag.tagId, isEqualTo(tagId)).build()
-                .render(RenderingStrategy.MYBATIS3);
-        tagMapper.selectByPrimaryKey(tagId).orElseThrow(ExceptionSuppliers.TAG_NOT_FOUND);
+                .render(RenderingStrategies.MYBATIS3);
         drugTagMapper.delete(deleteStatement);
-        tagMapper.deleteByPrimaryKey(tagId);
+        int row = tagMapper.deleteByPrimaryKey(tagId);
+        if (0 == row) {
+            throw ExceptionSuppliers.TAG_NOT_FOUND.get();
+        }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Long addNewTag(TagDTO dto) {
         Tag newTag = new Tag();
         modelMapper.map(dto, newTag);
@@ -81,7 +76,7 @@ public class TagService {
                 .where(tag.name, isEqualTo(dto.getName()))
                 .and(tag.userId, isEqualTo(dto.getUserId()))
                 .build()
-                .render(RenderingStrategy.MYBATIS3);
+                .render(RenderingStrategies.MYBATIS3);
         return tagMapper.selectMany(tagSelectStatement).get(0).getId();
     }
 
