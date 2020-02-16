@@ -1,6 +1,6 @@
 package cn.edu.nju.madpill.service;
 
-import cn.edu.nju.madpill.custommapper.AssistantMapper;
+import cn.edu.nju.madpill.custommapper.DrugAssistantMapper;
 import cn.edu.nju.madpill.domain.Drug;
 import cn.edu.nju.madpill.domain.Tag;
 import cn.edu.nju.madpill.dto.DrugBriefDTO;
@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static cn.edu.nju.madpill.custommapper.DrugAssistantDynamicSqlSupport.buildInsert;
 import static cn.edu.nju.madpill.mapper.DrugDynamicSqlSupport.drug;
 import static cn.edu.nju.madpill.mapper.DrugTagDynamicSqlSupport.drugTag;
 import static cn.edu.nju.madpill.mapper.TagDynamicSqlSupport.tag;
@@ -34,15 +35,17 @@ import static org.mybatis.dynamic.sql.SqlBuilder.*;
 @Service
 public class DrugService {
 
+    private final TagService tagService;
     private final DrugMapper drugMapper;
     private final TagMapper tagMapper;
-    private final AssistantMapper assistantMapper;
+    private final DrugAssistantMapper drugAssistantMapper;
     private final ModelMapper modelMapper;
 
-    public DrugService(DrugMapper drugMapper, TagMapper tagMapper, AssistantMapper assistantMapper, ModelMapper modelMapper) {
+    public DrugService(TagService tagService, DrugMapper drugMapper, TagMapper tagMapper, DrugAssistantMapper drugAssistantMapper, ModelMapper modelMapper) {
+        this.tagService = tagService;
         this.drugMapper = drugMapper;
         this.tagMapper = tagMapper;
-        this.assistantMapper = assistantMapper;
+        this.drugAssistantMapper = drugAssistantMapper;
         this.modelMapper = modelMapper;
     }
 
@@ -51,9 +54,10 @@ public class DrugService {
         Drug newDrug = new Drug();
         modelMapper.map(dto, newDrug);
 
-        // TODO user_id tags
+        // TODO user_id
         newDrug.setUserId(1L);
-        drugMapper.insert(newDrug);
+        drugAssistantMapper.insert(buildInsert(newDrug));
+        tagService.updateTagsOfDrug(newDrug.getId(), getTagIdsOfDrug(dto));
     }
 
     public DrugDTO getDrugDetail(Long drugId) {
@@ -84,9 +88,10 @@ public class DrugService {
         Drug modifiedDrug = new Drug();
         modelMapper.map(dto, modifiedDrug);
 
-        // TODO user_id tags
+        // TODO user_id
         modifiedDrug.setUserId(1L);
         drugMapper.updateByPrimaryKey(modifiedDrug);
+        tagService.updateTagsOfDrug(modifiedDrug.getId(), getTagIdsOfDrug(dto));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -108,6 +113,18 @@ public class DrugService {
                 .build()
                 .render(RenderingStrategies.MYBATIS3);
 
-        return assistantMapper.selectDrugs(drugsSelectStatement);
+        return drugAssistantMapper.selectDrugs(drugsSelectStatement);
+    }
+
+    private Long[] getTagIdsOfDrug(DrugDTO dto) {
+        if (null == dto.getTags()) {
+            return new Long[0];
+        }
+        Long[] tagIds = new Long[dto.getTags().size()];
+        List<TagDTO> dtoTags = dto.getTags();
+        for (int i = 0; i < dtoTags.size(); i++) {
+            tagIds[i] = dtoTags.get(i).getId();
+        }
+        return tagIds;
     }
 }

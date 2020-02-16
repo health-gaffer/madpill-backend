@@ -36,13 +36,13 @@ public class TagControllerTest {
     @Order(1)
     void testAddTag() throws Exception {
         // 新增
-        TagDTO dto = TagDTO.builder().id(110L).name("感冒").userId(111L).build();
+        TagDTO dto = TagDTO.builder().id(110L).name("感冒").build();
 
         mockMvc.perform(put("/tags")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.write(dto).getJson()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data").value(110))
                 .andExpect(jsonPath("$.code").value(200));
     }
 
@@ -51,7 +51,7 @@ public class TagControllerTest {
     void testGetTag() throws Exception {
         // 获得标签
         mockMvc.perform(
-                get("/tags/user?userId=111"))
+                get("/tags/user?userId=10086"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists())
                 .andExpect(jsonPath("$.data[0].id").value(110))

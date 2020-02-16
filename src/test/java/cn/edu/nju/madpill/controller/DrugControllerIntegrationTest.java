@@ -39,7 +39,6 @@ public class DrugControllerIntegrationTest {
     @Order(1)
     void addDrug() throws Exception {
         // 新增
-        dto.setId(1L);
         mockMvc.perform(
                 post("/drugs")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -97,12 +96,13 @@ public class DrugControllerIntegrationTest {
 
     private DrugDTO getDto() {
         return DrugDTO.builder()
+                .id(1L)
                 .name("测试药品1")
                 .producedDate(LocalDate.of(2019, 4, 7))
                 .expireDate(LocalDate.now())
                 .description("测试说明文字1")
-                .indication("测试适用症1")
-                .contraindication("测试禁忌1")
+                .indication("{\"content\":\"适用症\"}")
+                .contraindication("{\"content\":\"禁忌\"}")
                 .build();
     }
 

@@ -1,5 +1,7 @@
 package cn.edu.nju.madpill.service;
 
+import cn.edu.nju.madpill.custommapper.TagAssistantMapper;
+import cn.edu.nju.madpill.domain.DrugTag;
 import cn.edu.nju.madpill.domain.Tag;
 import cn.edu.nju.madpill.dto.TagDTO;
 import cn.edu.nju.madpill.exception.ExceptionSuppliers;
@@ -12,9 +14,11 @@ import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static cn.edu.nju.madpill.custommapper.TagAssistantDynamicSqlSupport.buildInsert;
 import static cn.edu.nju.madpill.mapper.DrugTagDynamicSqlSupport.drugTag;
 import static cn.edu.nju.madpill.mapper.TagDynamicSqlSupport.tag;
 import static org.mybatis.dynamic.sql.SqlBuilder.*;
@@ -31,11 +35,13 @@ public class TagService {
 
     private final DrugTagMapper drugTagMapper;
     private final TagMapper tagMapper;
+    private final TagAssistantMapper tagAssistantMapper;
     private final ModelMapper modelMapper;
 
-    public TagService(DrugTagMapper drugTagMapper, TagMapper tagMapper, ModelMapper modelMapper) {
+    public TagService(DrugTagMapper drugTagMapper, TagMapper tagMapper, TagAssistantMapper tagAssistantMapper, ModelMapper modelMapper) {
         this.drugTagMapper = drugTagMapper;
         this.tagMapper = tagMapper;
+        this.tagAssistantMapper = tagAssistantMapper;
         this.modelMapper = modelMapper;
     }
 
@@ -69,28 +75,28 @@ public class TagService {
     public Long addNewTag(TagDTO dto) {
         Tag newTag = new Tag();
         modelMapper.map(dto, newTag);
-        tagMapper.insert(newTag);
-        SelectStatementProvider tagSelectStatement = select(tag.id)
-                .from(tag)
-                .where(tag.name, isEqualTo(dto.getName()))
-                .and(tag.userId, isEqualTo(dto.getUserId()))
-                .build()
-                .render(RenderingStrategies.MYBATIS3);
-        return tagMapper.selectMany(tagSelectStatement).get(0).getId();
+        // TODO user_id
+        newTag.setUserId(10086L);
+
+        tagAssistantMapper.insert(buildInsert(newTag));
+        return newTag.getId();
     }
 
-//    public int updateTagsOfDrug(Long drugId, Long[] tagIds) {
-//        DeleteStatementProvider deleteStatement = deleteFrom(drugTag)
-//                .where(drugTag.drugId, isEqualTo(drugId)).build()
-//                .render(RenderingStrategy.MYBATIS3);
-//        drugTagMapper.delete(deleteStatement);
-//        List<DrugTag> drugTags = new ArrayList<>();
-//        for (Long tadId :tagIds){
-//            DrugTag drugTag = new DrugTag();
-//            drugTag.setDrugId(drugId);
-//            drugTag.setTagId(tadId);
-//            drugTags.add(drugTag);
-//        }
-//        return drugTagMapper.insertMultiple(drugTags);
-//    }
+    @Transactional(rollbackFor = Exception.class)
+    public int updateTagsOfDrug(Long drugId, Long[] tagIds) {
+        drugTagMapper.delete(c -> c.where(drugTag.drugId, isEqualTo(drugId)));
+
+        if (tagIds.length == 0) {
+            return 0;
+        } else {
+            List<DrugTag> drugTags = new ArrayList<>();
+            for (Long tadId : tagIds) {
+                DrugTag drugTag = new DrugTag();
+                drugTag.setDrugId(drugId);
+                drugTag.setTagId(tadId);
+                drugTags.add(drugTag);
+            }
+            return drugTagMapper.insertMultiple(drugTags);
+        }
+    }
 }
