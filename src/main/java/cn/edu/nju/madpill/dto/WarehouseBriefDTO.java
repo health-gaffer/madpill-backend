@@ -10,18 +10,16 @@ import lombok.NoArgsConstructor;
  * <p>
  *
  * @author Charles
- * @date 2020/2/13
+ * @date 2020/2/14
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WarehouseDTO {
+public class WarehouseBriefDTO {
+    private Long id;
+
     private String name;
 
     private String manufacture;
-
-    private String indication;
-
-    private String contraindication;
 }
