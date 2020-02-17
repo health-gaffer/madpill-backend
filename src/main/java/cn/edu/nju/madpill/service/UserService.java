@@ -1,25 +1,22 @@
 package cn.edu.nju.madpill.service;
 
-import cn.edu.nju.madpill.domain.Drug;
+import cn.edu.nju.madpill.config.CodecConfig;
 import cn.edu.nju.madpill.domain.User;
-import cn.edu.nju.madpill.dto.DrugDTO;
 import cn.edu.nju.madpill.exception.BaseException;
 import cn.edu.nju.madpill.mapper.UserMapper;
-import org.apache.tomcat.jni.Local;
+import cn.edu.nju.madpill.utils.Base64XORCodec;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
-import org.mybatis.dynamic.sql.render.RenderingStrategy;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.edu.nju.madpill.mapper.DrugTagDynamicSqlSupport.drugTag;
-import static cn.edu.nju.madpill.mapper.TagDynamicSqlSupport.tag;
-import static cn.edu.nju.madpill.mapper.TagDynamicSqlSupport.userId;
-import static org.mybatis.dynamic.sql.SqlBuilder.*;
-
 import static cn.edu.nju.madpill.mapper.UserDynamicSqlSupport.user;
+import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
+import static org.mybatis.dynamic.sql.SqlBuilder.select;
 
 /**
  * @author Aneureka
@@ -32,8 +29,12 @@ public class UserService {
 
     private final UserMapper userMapper;
 
-    public UserService(UserMapper userMapper) {
+    private final CodecConfig codecConfig;
+
+    @Autowired
+    public UserService(UserMapper userMapper, CodecConfig codecConfig) {
         this.userMapper = userMapper;
+        this.codecConfig = codecConfig;
     }
 
     public void addUserIfAbsent(String openId) throws BaseException {
@@ -53,4 +54,21 @@ public class UserService {
         }
     }
 
+    public String token2openId(String token) {
+        try {
+            String[] data = Base64XORCodec.decrypt(token, codecConfig.getKey()).split(" ");
+            if (data.length == 2) {
+                return data[0];
+            } else {
+                throw new IllegalArgumentException("Invalid token.");
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Invalid token.");
+        }
+    }
+
+    public String generateToken(String openId, String sessionKey) {
+        String data = String.format("%s %s", openId, sessionKey);
+        return Base64XORCodec.encrypt(data, codecConfig.getKey());
+    }
 }

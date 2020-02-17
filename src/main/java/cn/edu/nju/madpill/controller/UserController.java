@@ -1,11 +1,9 @@
 package cn.edu.nju.madpill.controller;
 
-import cn.binarywang.wx.miniapp.api.WxMaJsapiService;
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.edu.nju.madpill.dto.Result;
 import cn.edu.nju.madpill.service.UserService;
-import cn.edu.nju.madpill.utils.WechatUtil;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,12 +39,11 @@ public class UserController {
         try {
             WxMaJscode2SessionResult sessionResult = wxMaService.getUserService().getSessionInfo(code);
             String openId = sessionResult.getOpenid();
-            userService.addUserIfAbsent(openId);
             String sessionKey = sessionResult.getSessionKey();
-            System.out.println(WechatUtil.generateToken(openId, sessionKey));
+            userService.addUserIfAbsent(openId);
             return Result.builder()
                     .code(HttpStatus.OK.value())
-                    .data(WechatUtil.generateToken(openId, sessionKey))
+                    .data(userService.generateToken(openId, sessionKey))
                     .build();
         } catch (WxErrorException e) {
             logger.error(e.getMessage());
