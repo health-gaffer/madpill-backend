@@ -54,7 +54,7 @@ public class TagControllerTest {
                 get("/tags/user?userId=10086"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists())
-                .andExpect(jsonPath("$.data[0].id").value(110))
+                .andExpect(jsonPath("$.data[0].id").exists())
                 .andExpect(jsonPath("$.code").value(200));
     }
 

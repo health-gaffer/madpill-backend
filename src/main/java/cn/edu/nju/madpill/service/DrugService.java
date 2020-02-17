@@ -55,7 +55,7 @@ public class DrugService {
         modelMapper.map(dto, newDrug);
 
         // TODO user_id
-        newDrug.setUserId(1L);
+        newDrug.setUserId(10086L);
         drugAssistantMapper.insert(buildInsert(newDrug));
         tagService.updateTagsOfDrug(newDrug.getId(), getTagIdsOfDrug(dto));
     }
@@ -89,7 +89,7 @@ public class DrugService {
         modelMapper.map(dto, modifiedDrug);
 
         // TODO user_id
-        modifiedDrug.setUserId(1L);
+        modifiedDrug.setUserId(10086L);
         drugMapper.updateByPrimaryKey(modifiedDrug);
         tagService.updateTagsOfDrug(modifiedDrug.getId(), getTagIdsOfDrug(dto));
     }
