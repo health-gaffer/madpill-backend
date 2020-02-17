@@ -8,3 +8,5 @@ logging:
 wechat:
   appid: wxc11444cbc1419ebb
   appsecret: ENC(eaX7vN3Dlv1BA59OSDJO2PfJWEZy2/U4RFNbwBOSoRqABVpXppo0VYAF592zJ+r9)
+codec:
+  key: ENC(jbhMK4xYOe+JlQ1r7qjxPQ==)

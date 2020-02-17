@@ -5,6 +5,8 @@ import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.edu.nju.madpill.dto.Result;
 import cn.edu.nju.madpill.service.UserService;
 import me.chanjar.weixin.common.error.WxErrorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,8 @@ public class UserController {
 
     private final UserService userService;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     public UserController(WxMaService wxMaService, UserService userService) {
         this.wxMaService = wxMaService;
@@ -35,13 +39,19 @@ public class UserController {
         try {
             WxMaJscode2SessionResult sessionResult = wxMaService.getUserService().getSessionInfo(code);
             String openId = sessionResult.getOpenid();
+            String sessionKey = sessionResult.getSessionKey();
             userService.addUserIfAbsent(openId);
+            return Result.builder()
+                    .code(HttpStatus.OK.value())
+                    .data(userService.generateToken(openId, sessionKey))
+                    .build();
         } catch (WxErrorException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            return Result.builder()
+                    .code(HttpStatus.UNAUTHORIZED.value())
+                    .msg("Missed or invalid code.")
+                    .build();
         }
-        return Result.builder()
-                .code(HttpStatus.OK.value())
-                .build();
     }
 
 }
