@@ -106,12 +106,9 @@ public class DrugService {
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteDrug(Long drugId, User curUser) {
-        Optional<Drug> toDelete = drugMapper.selectByPrimaryKey(drugId);
-        if (toDelete.isPresent() && toDelete.get().getUserId().equals(curUser.getId())) {
-            int row = drugMapper.deleteByPrimaryKey(drugId);
-            if (0 == row) {
-                throw ExceptionSuppliers.DRUG_NOT_FOUND.get();
-            }
+        Drug toDelete = drugMapper.selectByPrimaryKey(drugId).orElseThrow(ExceptionSuppliers.DRUG_NOT_FOUND);
+        if (toDelete.getUserId().equals(curUser.getId())) {
+            drugMapper.deleteByPrimaryKey(drugId);
         } else {
             throw ExceptionSuppliers.PERMISSION_DENIED.get();
         }

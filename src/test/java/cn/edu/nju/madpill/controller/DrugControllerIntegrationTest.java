@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 
+import static cn.edu.nju.madpill.utils.MadPillConstant.HEADER_MADPILL_TOKEN_KEY;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -27,11 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DrugControllerIntegrationTest {
 
+    private static final String HEADER_MADPILL_TOKEN_VALUE = "AlgNG1FZKjpXLSkqPz5cDDw/Cw04CQIGQxAvOU0uFSIcIEc1E10gWS0HLlIPOyI0AiAwWU0=";
     @Autowired
     private MockMvc mockMvc;
-
     private DrugDTO dto = getDto();
-
     @Autowired
     private JacksonTester<DrugDTO> json;
 
@@ -41,6 +41,7 @@ public class DrugControllerIntegrationTest {
         // 新增
         mockMvc.perform(
                 post("/drugs")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.write(dto).getJson()))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -50,7 +51,9 @@ public class DrugControllerIntegrationTest {
     @Test
     @Order(2)
     void testGetDrugDetail() throws Exception {
-        mockMvc.perform(get("/drugs/1"))
+        mockMvc.perform(
+                get("/drugs/1")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists())
                 .andExpect(jsonPath("$.data.name").value("测试药品1"));
@@ -64,11 +67,14 @@ public class DrugControllerIntegrationTest {
         dto.setName("测试药品1修改");
         mockMvc.perform(
                 put("/drugs/1")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.write(dto).getJson()))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/drugs/1"))
+        mockMvc.perform(
+                get("/drugs/1")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists())
                 .andExpect(jsonPath("$.data.name").value("测试药品1修改"));
@@ -77,10 +83,10 @@ public class DrugControllerIntegrationTest {
     @Test
     @Order(4)
     void deleteDrug() throws Exception {
-
         // 删除
         mockMvc.perform(
                 delete("/drugs/1")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -88,10 +94,66 @@ public class DrugControllerIntegrationTest {
 
         mockMvc.perform(
                 delete("/drugs/10")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(404));
+    }
+
+    @Test
+    @Order(5)
+    void testInvalidToken() throws Exception {
+        final String INVALID_TOKEN = "invalid_token";
+        mockMvc.perform(
+                get("/drugs/1")
+                        .header(HEADER_MADPILL_TOKEN_KEY, INVALID_TOKEN))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(401));
+
+        mockMvc.perform(
+                put("/drugs/1")
+                        .header(HEADER_MADPILL_TOKEN_KEY, INVALID_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json.write(dto).getJson()))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(401));
+
+        mockMvc.perform(
+                delete("/drugs/1")
+                        .header(HEADER_MADPILL_TOKEN_KEY, INVALID_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(401));
+    }
+
+    @Test
+    @Order(6)
+    void testNoPermission() throws Exception {
+        mockMvc.perform(
+                get("/drugs/100")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(403));
+
+        mockMvc.perform(
+                put("/drugs/100")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json.write(dto).getJson()))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(403));
+
+        mockMvc.perform(
+                delete("/drugs/100")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(403));
     }
 
     private DrugDTO getDto() {
