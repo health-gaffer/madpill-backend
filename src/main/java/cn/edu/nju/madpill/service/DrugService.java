@@ -3,6 +3,7 @@ package cn.edu.nju.madpill.service;
 import cn.edu.nju.madpill.custommapper.DrugAssistantMapper;
 import cn.edu.nju.madpill.domain.Drug;
 import cn.edu.nju.madpill.domain.Tag;
+import cn.edu.nju.madpill.domain.User;
 import cn.edu.nju.madpill.dto.DrugBriefDTO;
 import cn.edu.nju.madpill.dto.DrugDTO;
 import cn.edu.nju.madpill.dto.TagDTO;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static cn.edu.nju.madpill.custommapper.DrugAssistantDynamicSqlSupport.buildInsert;
@@ -50,55 +52,68 @@ public class DrugService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void createNewDrug(DrugDTO dto) {
+    public void createNewDrug(DrugDTO dto, User curUser) {
         Drug newDrug = new Drug();
         modelMapper.map(dto, newDrug);
 
-        // TODO user_id
-        newDrug.setUserId(10086L);
+        newDrug.setUserId(curUser.getId());
         drugAssistantMapper.insert(buildInsert(newDrug));
         tagService.updateTagsOfDrug(newDrug.getId(), getTagIdsOfDrug(dto));
     }
 
-    public DrugDTO getDrugDetail(Long drugId) {
+    public DrugDTO getDrugDetail(Long drugId, User curUser) {
         Drug drugInfo = drugMapper.selectByPrimaryKey(drugId).orElseThrow(ExceptionSuppliers.DRUG_NOT_FOUND);
-        DrugDTO drugDTO = new DrugDTO();
-        modelMapper.map(drugInfo, drugDTO);
 
-        SelectStatementProvider selectStatement = select(tag.id, tag.name)
-                .from(drugTag)
-                .join(tag).on(drugTag.tagId, equalTo(tag.id))
-                .where(drugTag.drugId, isEqualTo(drugId))
-                .build()
-                .render(RenderingStrategies.MYBATIS3);
-        List<Tag> tags = tagMapper.selectMany(selectStatement);
+        if (drugInfo.getUserId().equals(curUser.getId())) {
+            DrugDTO drugDTO = new DrugDTO();
+            modelMapper.map(drugInfo, drugDTO);
 
-        List<TagDTO> tagDTOS = tags.stream().map(tag -> {
-            TagDTO cur = new TagDTO();
-            modelMapper.map(tag, cur);
-            return cur;
-        }).collect(Collectors.toList());
+            SelectStatementProvider selectStatement = select(tag.id, tag.name)
+                    .from(drugTag)
+                    .join(tag).on(drugTag.tagId, equalTo(tag.id))
+                    .where(drugTag.drugId, isEqualTo(drugId))
+                    .build()
+                    .render(RenderingStrategies.MYBATIS3);
+            List<Tag> tags = tagMapper.selectMany(selectStatement);
 
-        drugDTO.setTags(tagDTOS);
-        return drugDTO;
+            List<TagDTO> tagDTOS = tags.stream().map(tag -> {
+                TagDTO cur = new TagDTO();
+                modelMapper.map(tag, cur);
+                return cur;
+            }).collect(Collectors.toList());
+
+            drugDTO.setTags(tagDTOS);
+            return drugDTO;
+        } else {
+            throw ExceptionSuppliers.PERMISSION_DENIED.get();
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void modifyDrug(DrugDTO dto) {
-        Drug modifiedDrug = new Drug();
-        modelMapper.map(dto, modifiedDrug);
+    public void modifyDrug(DrugDTO dto, User curUser) {
+        Optional<Drug> toModify = drugMapper.selectByPrimaryKey(dto.getId());
+        if (toModify.isPresent() && toModify.get().getUserId().equals(curUser.getId())) {
+            Drug modifiedDrug = new Drug();
+            modelMapper.map(dto, modifiedDrug);
 
-        // TODO user_id
-        modifiedDrug.setUserId(10086L);
-        drugMapper.updateByPrimaryKey(modifiedDrug);
-        tagService.updateTagsOfDrug(modifiedDrug.getId(), getTagIdsOfDrug(dto));
+            modifiedDrug.setUserId(curUser.getId());
+            drugMapper.updateByPrimaryKey(modifiedDrug);
+            tagService.updateTagsOfDrug(modifiedDrug.getId(), getTagIdsOfDrug(dto));
+        } else {
+            throw ExceptionSuppliers.PERMISSION_DENIED.get();
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void deleteDrug(Long drugId) {
-        int row = drugMapper.deleteByPrimaryKey(drugId);
-        if (0 == row) {
-            throw ExceptionSuppliers.DRUG_NOT_FOUND.get();
+    public void deleteDrug(Long drugId, User curUser) {
+        Optional<Drug> toDelete = drugMapper.selectByPrimaryKey(drugId);
+        if (toDelete.isPresent() && toDelete.get().getUserId().equals(curUser.getId())) {
+            int row = drugMapper.deleteByPrimaryKey(drugId);
+            if (0 == row) {
+                throw ExceptionSuppliers.DRUG_NOT_FOUND.get();
+            }
+        } else {
+            throw ExceptionSuppliers.PERMISSION_DENIED.get();
         }
     }
 
