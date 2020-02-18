@@ -1,10 +1,9 @@
 package cn.edu.nju.madpill.utils;
 
 import org.springframework.stereotype.Component;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 import java.io.IOException;
+import java.util.Base64;
 
 /**
  * @author Aneureka
@@ -32,13 +31,13 @@ public class Base64XORCodec {
     }
 
     private static byte[] base64Decode(String s) throws IOException {
-        BASE64Decoder d = new BASE64Decoder();
-        return d.decodeBuffer(s);
+        Base64.Decoder d = Base64.getDecoder();
+        return d.decode(s);
     }
 
     private static String base64Encode(byte[] bytes) {
-        BASE64Encoder enc = new BASE64Encoder();
-        return enc.encode(bytes).replaceAll("\\s", "");
+        Base64.Encoder enc = Base64.getEncoder();
+        return new String(enc.encode(bytes)).replaceAll("\\s", "");
     }
 
 }
