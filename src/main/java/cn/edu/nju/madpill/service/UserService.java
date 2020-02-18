@@ -2,7 +2,6 @@ package cn.edu.nju.madpill.service;
 
 import cn.edu.nju.madpill.config.CodecConfig;
 import cn.edu.nju.madpill.domain.User;
-import cn.edu.nju.madpill.exception.BaseException;
 import cn.edu.nju.madpill.mapper.UserMapper;
 import cn.edu.nju.madpill.utils.Base64XORCodec;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
@@ -10,7 +9,6 @@ import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -71,14 +69,10 @@ public class UserService {
     }
 
     private String token2openId(String token) {
-        try {
-            String[] data = Base64XORCodec.decrypt(token, codecConfig.getKey()).split(" ");
-            if (data.length == 2) {
-                return data[0];
-            } else {
-                throw new IllegalArgumentException("Invalid token.");
-            }
-        } catch (IOException e) {
+        String[] data = Base64XORCodec.decrypt(token, codecConfig.getKey()).split(" ");
+        if (data.length == 2) {
+            return data[0];
+        } else {
             throw new IllegalArgumentException("Invalid token.");
         }
     }

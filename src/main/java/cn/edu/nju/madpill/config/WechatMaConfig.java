@@ -20,14 +20,14 @@ public class WechatMaConfig {
     private WechatAccountConfig weChatAccountConfig;
 
     @Bean
-    public WxMaService wxMaService(){
+    public WxMaService wxMaService() {
         WxMaService wxMaService = new WxMaServiceImpl();
         wxMaService.setWxMaConfig(wxMaConfig());
         return wxMaService;
     }
 
     @Bean
-    public WxMaConfig wxMaConfig(){
+    public WxMaConfig wxMaConfig() {
         WxMaInMemoryConfig wxMaInMemoryConfig = new WxMaInMemoryConfig();
         wxMaInMemoryConfig.setAppid(weChatAccountConfig.getAppId());
         wxMaInMemoryConfig.setSecret(weChatAccountConfig.getAppSecret());
