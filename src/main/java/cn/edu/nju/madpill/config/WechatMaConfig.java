@@ -20,7 +20,7 @@ public class WechatMaConfig {
     private WechatAccountConfig weChatAccountConfig;
 
     @Bean
-    public WxMaService wxMpService(){
+    public WxMaService wxMaService(){
         WxMaService wxMaService = new WxMaServiceImpl();
         wxMaService.setWxMaConfig(wxMaConfig());
         return wxMaService;
