@@ -106,6 +106,15 @@ public class DrugControllerIntegrationTest {
     void testInvalidToken() throws Exception {
         final String INVALID_TOKEN = "invalid_token";
         mockMvc.perform(
+                post("/drugs")
+                        .header(HEADER_MADPILL_TOKEN_KEY, INVALID_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json.write(dto).getJson()))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(401));
+
+        mockMvc.perform(
                 get("/drugs/1")
                         .header(HEADER_MADPILL_TOKEN_KEY, INVALID_TOKEN))
                 .andExpect(status().isOk())
