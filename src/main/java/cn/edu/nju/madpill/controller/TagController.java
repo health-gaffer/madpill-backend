@@ -1,10 +1,17 @@
 package cn.edu.nju.madpill.controller;
 
+import cn.edu.nju.madpill.domain.User;
 import cn.edu.nju.madpill.dto.Result;
 import cn.edu.nju.madpill.dto.TagDTO;
+import cn.edu.nju.madpill.exception.ExceptionSuppliers;
 import cn.edu.nju.madpill.service.TagService;
+import cn.edu.nju.madpill.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+
+import static cn.edu.nju.madpill.utils.MadPillConstant.HEADER_MADPILL_TOKEN_KEY;
 
 /**
  * <p>
@@ -18,17 +25,25 @@ import org.springframework.web.bind.annotation.*;
 public class TagController {
 
     final TagService tagService;
+    final UserService userService;
 
-    public TagController(TagService tagService) {
+    public TagController(TagService tagService, UserService userService) {
         this.tagService = tagService;
+        this.userService = userService;
     }
 
     @GetMapping(path = "/user")
-    public Result getTagsOfUser(@RequestParam("userId") Long userId) {
-        return Result.builder()
-                .data(tagService.getTagsOfUser(userId))
-                .code(HttpStatus.OK.value())
-                .build();
+    public Result getTagsOfUser(@RequestHeader(name = HEADER_MADPILL_TOKEN_KEY) String token ) {
+        Optional<User> curUser = userService.getUserByToken(token);
+        if (curUser.isPresent()) {
+            return Result.builder()
+                    .data(tagService.getTagsOfUser(curUser.get().getId()))
+                    .code(HttpStatus.OK.value())
+                    .build();
+        } else {
+            throw ExceptionSuppliers.INVALID_TOKEN.get();
+        }
+
     }
 
     @DeleteMapping(path = "/{tagId}")
@@ -40,11 +55,16 @@ public class TagController {
     }
 
     @PutMapping(path = "")
-    public Result addNewTag(@RequestBody TagDTO tagDTO) {
-        return Result.builder()
-                .data(tagService.addNewTag(tagDTO))
-                .code(HttpStatus.OK.value())
-                .build();
+    public Result addNewTag(@RequestHeader(name = HEADER_MADPILL_TOKEN_KEY) String token, @RequestBody TagDTO tagDTO) {
+        Optional<User> curUser = userService.getUserByToken(token);
+        if (curUser.isPresent()) {
+            return Result.builder()
+                    .data(tagService.addNewTag(tagDTO,curUser.get().getId()))
+                    .code(HttpStatus.OK.value())
+                    .build();
+        } else {
+            throw ExceptionSuppliers.INVALID_TOKEN.get();
+        }
     }
 
 

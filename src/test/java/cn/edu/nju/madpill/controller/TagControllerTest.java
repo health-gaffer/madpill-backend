@@ -14,6 +14,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static cn.edu.nju.madpill.utils.MadPillConstant.HEADER_MADPILL_TOKEN_KEY;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -25,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureJsonTesters
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TagControllerTest {
+    private static final String HEADER_MADPILL_TOKEN_VALUE = "AlgNG1FZKjpXLSkqPz5cDDw/Cw04CQIGQxAvOU0uFSIcIEc1E10gWS0HLlIPOyI0AiAwWU0=";
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,6 +42,7 @@ public class TagControllerTest {
 
         mockMvc.perform(put("/tags")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
                 .content(json.write(dto).getJson()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value(110))
@@ -50,8 +53,8 @@ public class TagControllerTest {
     @Order(2)
     void testGetTag() throws Exception {
         // 获得标签
-        mockMvc.perform(
-                get("/tags/user?userId=10086"))
+        mockMvc.perform(get("/tags/user")
+                .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists())
                 .andExpect(jsonPath("$.data[0].id").exists())

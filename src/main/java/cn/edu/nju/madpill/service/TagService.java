@@ -72,12 +72,10 @@ public class TagService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Long addNewTag(TagDTO dto) {
+    public Long addNewTag(TagDTO dto, Long userId) {
         Tag newTag = new Tag();
         modelMapper.map(dto, newTag);
-        // TODO user_id
-        newTag.setUserId(10086L);
-
+        newTag.setUserId(userId);
         tagAssistantMapper.insert(buildInsert(newTag));
         return newTag.getId();
     }
