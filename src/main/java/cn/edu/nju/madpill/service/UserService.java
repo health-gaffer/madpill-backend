@@ -9,10 +9,12 @@ import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static cn.edu.nju.madpill.mapper.UserDynamicSqlSupport.user;
 import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
@@ -25,6 +27,7 @@ import static org.mybatis.dynamic.sql.SqlBuilder.select;
  **/
 
 @Service
+@Transactional
 public class UserService {
 
     private final UserMapper userMapper;
@@ -39,14 +42,7 @@ public class UserService {
 
     public void addUserIfAbsent(String openId) throws BaseException {
         // check if the user exists
-        SelectStatementProvider selectStatement = select(user.id, user.openId)
-                .from(user)
-                .where(user.openId, isEqualTo(openId))
-                .build()
-                .render(RenderingStrategies.MYBATIS3);
-        List<User> users = userMapper.selectMany(selectStatement);
-        // if not exists
-        if (users.isEmpty()) {
+        if (!getUserByOpenId(openId).isPresent()) {
             User record = new User();
             record.setOpenId(openId);
             record.setCreatedAt(LocalDateTime.now());
@@ -54,7 +50,30 @@ public class UserService {
         }
     }
 
-    public String token2openId(String token) {
+    public Optional<User> getUserByToken(String token) {
+        try {
+            String openId = token2openId(token);
+            return getUserByOpenId(openId);
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<User> getUserByOpenId(String openId) {
+        SelectStatementProvider selectStatement = select(user.id, user.openId)
+                .from(user)
+                .where(user.openId, isEqualTo(openId))
+                .build()
+                .render(RenderingStrategies.MYBATIS3);
+        return userMapper.selectOne(selectStatement);
+    }
+
+    public String generateToken(String openId, String sessionKey) {
+        String data = String.format("%s %s", openId, sessionKey);
+        return Base64XORCodec.encrypt(data, codecConfig.getKey());
+    }
+
+    private String token2openId(String token) {
         try {
             String[] data = Base64XORCodec.decrypt(token, codecConfig.getKey()).split(" ");
             if (data.length == 2) {
@@ -67,8 +86,4 @@ public class UserService {
         }
     }
 
-    public String generateToken(String openId, String sessionKey) {
-        String data = String.format("%s %s", openId, sessionKey);
-        return Base64XORCodec.encrypt(data, codecConfig.getKey());
-    }
 }
