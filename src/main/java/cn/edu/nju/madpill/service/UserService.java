@@ -7,13 +7,11 @@ import cn.edu.nju.madpill.mapper.UserMapper;
 import cn.edu.nju.madpill.utils.Base64XORCodec;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static cn.edu.nju.madpill.mapper.UserDynamicSqlSupport.user;
@@ -39,7 +37,7 @@ public class UserService {
         this.codecConfig = codecConfig;
     }
 
-    public void addUserIfAbsent(String openId) throws BaseException {
+    public void addUserIfAbsent(String openId) {
         // check if the user exists
         if (!getUserByOpenId(openId).isPresent()) {
             User record = new User();
