@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cn.edu.nju.madpill.utils.MadPillConstant.HEADER_MADPILL_TOKEN_KEY;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DrugTagIntegrationTest {
 
+    private static final String HEADER_MADPILL_TOKEN_VALUE = "AlgNG1FZKjpXLSkqPz5cDDw/Cw04CQIGQxAvOU0uFSIcIEc1E10gWS0HLlIPOyI0AiAwWU0=";
     private DrugDTO drugDTO = getDrugDto();
 
     @Autowired
@@ -46,30 +48,38 @@ public class DrugTagIntegrationTest {
     void addTag() throws Exception {
         // 新增标签
         TagDTO dto1 = getTagDto(1);
-        mockMvc.perform(put("/tags")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(tagJson.write(dto1).getJson()))
+        mockMvc.perform(
+                post("/tags")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(tagJson.write(dto1).getJson()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value(1));
 
         TagDTO dto2 = getTagDto(2);
-        mockMvc.perform(put("/tags")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(tagJson.write(dto2).getJson()))
+        mockMvc.perform(
+                post("/tags")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(tagJson.write(dto2).getJson()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value(2));
 
         TagDTO dto3 = getTagDto(3);
-        mockMvc.perform(put("/tags")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(tagJson.write(dto3).getJson()))
+        mockMvc.perform(
+                post("/tags")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(tagJson.write(dto3).getJson()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value(3));
 
         TagDTO dto4 = getTagDto(4);
-        mockMvc.perform(put("/tags")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(tagJson.write(dto4).getJson()))
+        mockMvc.perform(
+                post("/tags")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(tagJson.write(dto4).getJson()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value(4));
     }
@@ -80,6 +90,7 @@ public class DrugTagIntegrationTest {
         // 新增药品
         mockMvc.perform(
                 post("/drugs")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(drugJson.write(drugDTO).getJson()))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -90,7 +101,9 @@ public class DrugTagIntegrationTest {
     @Order(3)
     void checkDrugTag() throws Exception {
         // 检查标签
-        mockMvc.perform(get("/drugs/1"))
+        mockMvc.perform(
+                get("/drugs/1")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists())
                 .andExpect(jsonPath("$.data.tags").exists())
@@ -113,6 +126,7 @@ public class DrugTagIntegrationTest {
         drugDTO.setTags(modifiedTags);
         mockMvc.perform(
                 put("/drugs/1")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(drugJson.write(drugDTO).getJson()))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -123,7 +137,9 @@ public class DrugTagIntegrationTest {
     @Order(5)
     void checkModifyDrugTag() throws Exception {
         // 检查标签
-        mockMvc.perform(get("/drugs/1"))
+        mockMvc.perform(
+                get("/drugs/1")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists())
                 .andExpect(jsonPath("$.data.tags[0].id").value(3))
@@ -139,6 +155,7 @@ public class DrugTagIntegrationTest {
         // 删除药品
         mockMvc.perform(
                 delete("/drugs/1")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -146,19 +163,23 @@ public class DrugTagIntegrationTest {
 
         // 删除标签
         mockMvc.perform(
-                delete("/tags/1"))
+                delete("/tags/1")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
         mockMvc.perform(
-                delete("/tags/2"))
+                delete("/tags/2")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
         mockMvc.perform(
-                delete("/tags/3"))
+                delete("/tags/3")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
         mockMvc.perform(
-                delete("/tags/4"))
+                delete("/tags/4")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 

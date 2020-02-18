@@ -40,10 +40,11 @@ public class TagControllerTest {
         // 新增
         TagDTO dto = TagDTO.builder().id(110L).name("感冒").build();
 
-        mockMvc.perform(put("/tags")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
-                .content(json.write(dto).getJson()))
+        mockMvc.perform(
+                post("/tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
+                        .content(json.write(dto).getJson()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value(110))
                 .andExpect(jsonPath("$.code").value(200));
@@ -53,8 +54,9 @@ public class TagControllerTest {
     @Order(2)
     void testGetTag() throws Exception {
         // 获得标签
-        mockMvc.perform(get("/tags/user")
-                .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
+        mockMvc.perform(
+                get("/tags")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists())
                 .andExpect(jsonPath("$.data[0].id").exists())
@@ -66,8 +68,45 @@ public class TagControllerTest {
     void testDeleteTag() throws Exception {
         // 删除
         mockMvc.perform(
-                delete("/tags/110"))
+                delete("/tags/110")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
+    }
+
+    @Test
+    @Order(4)
+    void testInvalidToken() throws Exception {
+        final String INVALID_TOKEN = "invalid_token";
+        final TagDTO dto = TagDTO.builder().name("感冒").build();
+        mockMvc.perform(
+                post("/tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HEADER_MADPILL_TOKEN_KEY, INVALID_TOKEN)
+                        .content(json.write(dto).getJson()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(401));
+
+        mockMvc.perform(
+                get("/tags")
+                        .header(HEADER_MADPILL_TOKEN_KEY, INVALID_TOKEN))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(401));
+
+        mockMvc.perform(
+                delete("/tags/101")
+                        .header(HEADER_MADPILL_TOKEN_KEY, INVALID_TOKEN))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(401));
+    }
+
+    @Test
+    @Order(5)
+    void testNoPermission() throws Exception {
+        mockMvc.perform(
+                delete("/tags/101")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(403));
     }
 }
