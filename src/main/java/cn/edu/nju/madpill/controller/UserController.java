@@ -7,7 +7,6 @@ import cn.edu.nju.madpill.service.UserService;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,15 +26,13 @@ public class UserController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
     public UserController(WxMaService wxMaService, UserService userService) {
         this.wxMaService = wxMaService;
         this.userService = userService;
     }
 
     @PostMapping(value = "")
-    @ResponseBody
-    public Result login(@RequestBody String code){
+    public Result login(@RequestBody String code) {
         try {
             WxMaJscode2SessionResult sessionResult = wxMaService.getUserService().getSessionInfo(code);
             String openId = sessionResult.getOpenid();

@@ -60,14 +60,17 @@ public class TagService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void deleteTag(Long tagId) {
-        DeleteStatementProvider deleteStatement = deleteFrom(drugTag)
-                .where(drugTag.tagId, isEqualTo(tagId)).build()
-                .render(RenderingStrategies.MYBATIS3);
-        drugTagMapper.delete(deleteStatement);
-        int row = tagMapper.deleteByPrimaryKey(tagId);
-        if (0 == row) {
-            throw ExceptionSuppliers.TAG_NOT_FOUND.get();
+    public void deleteTag(Long tagId, Long userId) {
+        Tag toDelete = tagMapper.selectByPrimaryKey(tagId).orElseThrow(ExceptionSuppliers.TAG_NOT_FOUND);
+        if (userId.equals(toDelete.getUserId())) {
+            DeleteStatementProvider deleteStatement = deleteFrom(drugTag)
+                    .where(drugTag.tagId, isEqualTo(tagId))
+                    .build()
+                    .render(RenderingStrategies.MYBATIS3);
+            drugTagMapper.delete(deleteStatement);
+            tagMapper.deleteByPrimaryKey(tagId);
+        } else {
+            throw ExceptionSuppliers.PERMISSION_DENIED.get();
         }
     }
 
@@ -81,7 +84,7 @@ public class TagService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int updateTagsOfDrug(Long drugId, Long[] tagIds) {
+    protected int updateTagsOfDrug(Long drugId, Long[] tagIds) {
         drugTagMapper.delete(c -> c.where(drugTag.drugId, isEqualTo(drugId)));
 
         if (tagIds.length == 0) {

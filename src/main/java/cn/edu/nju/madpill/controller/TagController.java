@@ -32,8 +32,8 @@ public class TagController {
         this.userService = userService;
     }
 
-    @GetMapping(path = "/user")
-    public Result getTagsOfUser(@RequestHeader(name = HEADER_MADPILL_TOKEN_KEY) String token ) {
+    @GetMapping(path = "")
+    public Result getTagsOfUser(@RequestHeader(name = HEADER_MADPILL_TOKEN_KEY) String token) {
         Optional<User> curUser = userService.getUserByToken(token);
         if (curUser.isPresent()) {
             return Result.builder()
@@ -47,19 +47,25 @@ public class TagController {
     }
 
     @DeleteMapping(path = "/{tagId}")
-    public Result deleteTag(@PathVariable("tagId") Long tagId) {
-        tagService.deleteTag(tagId);
-        return Result.builder()
-                .code(HttpStatus.OK.value())
-                .build();
+    public Result deleteTag(@RequestHeader(name = HEADER_MADPILL_TOKEN_KEY) String token,
+                            @PathVariable("tagId") Long tagId) {
+        Optional<User> curUser = userService.getUserByToken(token);
+        if (curUser.isPresent()) {
+            tagService.deleteTag(tagId, curUser.get().getId());
+            return Result.builder()
+                    .code(HttpStatus.OK.value())
+                    .build();
+        } else {
+            throw ExceptionSuppliers.INVALID_TOKEN.get();
+        }
     }
 
-    @PutMapping(path = "")
+    @PostMapping(path = "")
     public Result addNewTag(@RequestHeader(name = HEADER_MADPILL_TOKEN_KEY) String token, @RequestBody TagDTO tagDTO) {
         Optional<User> curUser = userService.getUserByToken(token);
         if (curUser.isPresent()) {
             return Result.builder()
-                    .data(tagService.addNewTag(tagDTO,curUser.get().getId()))
+                    .data(tagService.addNewTag(tagDTO, curUser.get().getId()))
                     .code(HttpStatus.OK.value())
                     .build();
         } else {

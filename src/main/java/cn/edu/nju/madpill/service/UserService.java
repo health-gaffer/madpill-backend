@@ -34,7 +34,6 @@ public class UserService {
 
     private final CodecConfig codecConfig;
 
-    @Autowired
     public UserService(UserMapper userMapper, CodecConfig codecConfig) {
         this.userMapper = userMapper;
         this.codecConfig = codecConfig;
