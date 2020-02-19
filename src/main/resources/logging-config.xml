@@ -22,8 +22,14 @@
     </appender>
 
     <springProfile name="dev">
-        <root level="debug">
+        <root level="info">
             <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="prod">
+        <root level="info">
             <appender-ref ref="file"/>
         </root>
     </springProfile>

@@ -6,6 +6,7 @@ import cn.edu.nju.madpill.domain.Tag;
 import cn.edu.nju.madpill.domain.User;
 import cn.edu.nju.madpill.dto.DrugBriefDTO;
 import cn.edu.nju.madpill.dto.DrugDTO;
+import cn.edu.nju.madpill.dto.DrugsListDTO;
 import cn.edu.nju.madpill.dto.TagDTO;
 import cn.edu.nju.madpill.exception.ExceptionSuppliers;
 import cn.edu.nju.madpill.mapper.DrugMapper;
@@ -16,7 +17,11 @@ import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -36,6 +41,11 @@ import static org.mybatis.dynamic.sql.SqlBuilder.*;
  */
 @Service
 public class DrugService {
+
+    /**
+     * 默认需要提醒的即将过期的时间
+     */
+    private static final int EXPIRING_DAY = 15;
 
     private final TagService tagService;
     private final DrugMapper drugMapper;
@@ -114,18 +124,47 @@ public class DrugService {
         }
     }
 
-    public List<DrugBriefDTO> getUserDrugs(Long userId) {
+    public DrugsListDTO getUserDrugs(Long userId) {
         SelectStatementProvider drugsSelectStatement = select(drug.id.as("drug_id"), drug.name.as("drug_name"), drug.expireDate.as("expireDate"),
                 tag.id.as("tag_id"), tag.name.as("tag_name"))
                 .from(user)
                 .join(drug, on(user.id, equalTo(drug.userId)))
-                .join(drugTag, on(drug.id, equalTo(drugTag.drugId)))
-                .join(tag, on(drugTag.tagId, equalTo(tag.id)))
+                .leftJoin(drugTag, on(drug.id, equalTo(drugTag.drugId)))
+                .leftJoin(tag, on(drugTag.tagId, equalTo(tag.id)))
                 .where(user.id, isEqualTo(userId))
                 .build()
                 .render(RenderingStrategies.MYBATIS3);
 
-        return drugAssistantMapper.selectDrugs(drugsSelectStatement);
+        List<DrugBriefDTO> dtos = drugAssistantMapper.selectDrugs(drugsSelectStatement);
+
+        final LocalDate today = LocalDate.now();
+        dtos.forEach(dto -> {
+            if (today.isAfter(dto.getExpireDate())) {
+                System.out.println("expired");
+                dto.setDay(dto.getExpireDate().until(today, ChronoUnit.DAYS));
+            } else if (today.plusDays(EXPIRING_DAY).isAfter(dto.getExpireDate())) {
+                System.out.println("expiring");
+                dto.setDay(today.until(dto.getExpireDate(), ChronoUnit.DAYS) + 1);
+            } else {
+                System.out.println("notExpired");
+            }
+        });
+
+        Map<String, List<DrugBriefDTO>> dtoMap = dtos.stream()
+                .collect(Collectors.groupingBy(dto -> {
+                    if (today.isAfter(dto.getExpireDate())) {
+                        return "expired";
+                    } else if (today.plusDays(EXPIRING_DAY).isAfter(dto.getExpireDate())) {
+                        return "expiring";
+                    } else {
+                        return "notExpired";
+                    }
+                }));
+        return DrugsListDTO.builder()
+                .expired(dtoMap.getOrDefault("expired", new ArrayList<>()))
+                .expiring(dtoMap.getOrDefault("expiring", new ArrayList<>()))
+                .notExpired(dtoMap.getOrDefault("notExpired", new ArrayList<>()))
+                .build();
     }
 
     private Long[] getTagIdsOfDrug(DrugDTO dto) {
