@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+        <typeAlias type="cn.edu.nju.madpill.dto.DrugBriefDTO" alias="DrugBriefDTO"/>
+        <typeAlias type="cn.edu.nju.madpill.dto.TagDTO" alias="TagDTO"/>
+        <package name="cn.edu.nju.madpill.domain"/>
+    </typeAliases>
+    <mappers>
+        <mapper resource="mapping/AssistantMapper.xml"/>
+    </mappers>
+</configuration>

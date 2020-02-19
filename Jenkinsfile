@@ -7,10 +7,20 @@ pipeline {
     }
     stages {
         stage('Test') {
+            options {
+                retry(2)
+            }
+            environment {
+                JASYPT_ENCRYPTOR_PASSWORD = credentials('jasypt-encryptor-password')
+                MYBATIS_GENERATOR_JDBC_PASSWORD = credentials('mybatis-generator-jdbcPassword')
+            }
             steps {
-                sh 'mvn clean test -Dmaven.test.failure.ignore=false'
+                sh 'mvn mybatis-generator:generate -Dmybatis.generator.jdbcPassword=$MYBATIS_GENERATOR_JDBC_PASSWORD'
+                sh 'mvn clean test -Djasypt.encryptor.password=$JASYPT_ENCRYPTOR_PASSWORD -Dmaven.test.failure.ignore=false'
                 junit '**/target/surefire-reports/*.xml'
                 stash includes: '**/target/jacoco.exec', name: 'jacoco'
+                stash includes: '**/domain/', name: 'domains'
+                stash includes: '**/mapper/', name: 'mappers'
             }
         }
         stage('Sonar') {
@@ -29,7 +39,9 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'mvn package'
+                unstash 'domains'
+                unstash 'mappers'
+                sh 'mvn package -DskipTests'
             }
         }
         stage('Deploy') {

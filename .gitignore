@@ -45,3 +45,6 @@ atlassian-ide-plugin.xml
 # Secret
 env.sh
 
+/logs
+/src/main/java/cn/edu/nju/madpill/domain/
+/src/main/java/cn/edu/nju/madpill/mapper/
