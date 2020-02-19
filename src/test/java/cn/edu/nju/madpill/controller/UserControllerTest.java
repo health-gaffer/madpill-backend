@@ -20,9 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Log
 @SpringBootTest
 @AutoConfigureMockMvc
-@ComponentScan(basePackages = "cn.binarywang.wx.miniapp")
 @AutoConfigureMybatis
-@MockBeans({@MockBean(WxMaService.class)})
 class UserControllerTest {
 
     @Autowired
@@ -30,8 +28,7 @@ class UserControllerTest {
 
     @Test
     void login() throws Exception {
-//        mockMvc.perform(post("/users").content("013xjpFw1oEKWe0AXnIw1h5hFw1xjpFN"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.data").exists());
+        mockMvc.perform(post("/users").content("013xjpFw1oEKWe0AXnIw1h5hFw1xjpFN"))
+                .andExpect(status().isOk());
     }
 }
