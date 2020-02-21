@@ -10,8 +10,10 @@ import cn.edu.nju.madpill.dto.DrugsListDTO;
 import cn.edu.nju.madpill.dto.TagDTO;
 import cn.edu.nju.madpill.exception.ExceptionSuppliers;
 import cn.edu.nju.madpill.mapper.DrugMapper;
+import cn.edu.nju.madpill.mapper.DrugTagMapper;
 import cn.edu.nju.madpill.mapper.TagMapper;
 import org.modelmapper.ModelMapper;
+import org.mybatis.dynamic.sql.delete.render.DeleteStatementProvider;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 import org.springframework.stereotype.Service;
@@ -49,13 +51,15 @@ public class DrugService {
 
     private final TagService tagService;
     private final DrugMapper drugMapper;
+    private final DrugTagMapper drugTagMapper;
     private final TagMapper tagMapper;
     private final DrugAssistantMapper drugAssistantMapper;
     private final ModelMapper modelMapper;
 
-    public DrugService(TagService tagService, DrugMapper drugMapper, TagMapper tagMapper, DrugAssistantMapper drugAssistantMapper, ModelMapper modelMapper) {
+    public DrugService(TagService tagService, DrugMapper drugMapper, DrugTagMapper drugTagMapper, TagMapper tagMapper, DrugAssistantMapper drugAssistantMapper, ModelMapper modelMapper) {
         this.tagService = tagService;
         this.drugMapper = drugMapper;
+        this.drugTagMapper = drugTagMapper;
         this.tagMapper = tagMapper;
         this.drugAssistantMapper = drugAssistantMapper;
         this.modelMapper = modelMapper;
@@ -126,6 +130,34 @@ public class DrugService {
         } else {
             throw ExceptionSuppliers.PERMISSION_DENIED.get();
         }
+        // 删除 drug_tag 相应记录
+        DeleteStatementProvider drugTagDeleteStatement = deleteFrom(drugTag)
+                .where(drugTag.drugId, isEqualTo(drugId))
+                .build()
+                .render(RenderingStrategies.MYBATIS3);
+        drugTagMapper.delete(drugTagDeleteStatement);
+    }
+
+    /**
+     * 批量删除
+     *
+     * @param selectedDrugsId 选择的药品 id 列表
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteDrugs(List<Long> selectedDrugsId) {
+        // 删除 drug 中的记录
+        DeleteStatementProvider drugsDeleteStatement = deleteFrom(drug)
+                .where(drug.id, isIn(selectedDrugsId))
+                .build()
+                .render(RenderingStrategies.MYBATIS3);
+        drugMapper.delete(drugsDeleteStatement);
+
+        // 删除 drug_tag 相应记录
+        DeleteStatementProvider drugTagDeleteStatement = deleteFrom(drugTag)
+                .where(drugTag.drugId, isIn(selectedDrugsId))
+                .build()
+                .render(RenderingStrategies.MYBATIS3);
+        drugTagMapper.delete(drugTagDeleteStatement);
     }
 
     public DrugsListDTO getUserDrugs(Long userId) {

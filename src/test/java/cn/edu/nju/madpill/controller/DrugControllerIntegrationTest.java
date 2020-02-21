@@ -1,6 +1,7 @@
 package cn.edu.nju.madpill.controller;
 
 import cn.edu.nju.madpill.dto.DrugDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.java.Log;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -12,9 +13,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 import static cn.edu.nju.madpill.utils.MadPillConstant.HEADER_MADPILL_TOKEN_KEY;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -26,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureJsonTesters
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@ActiveProfiles("test")
 public class DrugControllerIntegrationTest {
 
     private static final String HEADER_MADPILL_TOKEN_VALUE = "AlgNG1FZKjpXLSkqPz5cDDw/Cw04CQIGQxAvOU0uFSIcIEc1E10gWS0HLlIPOyI0AiAwWU0=";
@@ -34,6 +40,9 @@ public class DrugControllerIntegrationTest {
     private DrugDTO dto = getDto();
     @Autowired
     private JacksonTester<DrugDTO> json;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     @Order(1)
@@ -163,6 +172,28 @@ public class DrugControllerIntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(403));
+    }
+
+    @Test
+    void testDeleteDrugs() throws Exception {
+        String token = "AlgNG1FZKwQsEEk2KCgBAlEcOSI7DwwKMigAH004LyUAWhpcEFApXl9fAC8OJFsdKVowWU0=";
+        List<Long> selectedDrugsId = Arrays.asList(100L, 119L);
+        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(selectedDrugsId);
+        System.out.println(json);
+        mockMvc.perform(
+                delete("/drugs")
+                        .header(HEADER_MADPILL_TOKEN_KEY, token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        mockMvc.perform(get("/drugs")
+                .header(HEADER_MADPILL_TOKEN_KEY, token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..expired.length()").value(0))
+                .andExpect(jsonPath("$..expiring.length()").value(0))
+                .andExpect(jsonPath("$..notExpired.length()").value(0));
     }
 
     private DrugDTO getDto() {
