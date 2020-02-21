@@ -1,6 +1,7 @@
 package cn.edu.nju.madpill.controller;
 
 import cn.edu.nju.madpill.dto.DrugDTO;
+import cn.edu.nju.madpill.dto.GroupBriefDTO;
 import lombok.extern.java.Log;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -165,6 +166,16 @@ public class DrugControllerIntegrationTest {
                 .andExpect(jsonPath("$.code").value(403));
     }
 
+    @Test
+    @Order(7)
+    void testGroupForeignerKeyWrong() throws Exception {
+        mockMvc.perform(
+                get("/drugs/2")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(500));
+    }
+
     private DrugDTO getDto() {
         return DrugDTO.builder()
                 .id(1L)
@@ -174,6 +185,7 @@ public class DrugControllerIntegrationTest {
                 .description("测试说明文字1")
                 .indication("{\"content\":\"适用症\"}")
                 .contraindication("{\"content\":\"禁忌\"}")
+                .group(GroupBriefDTO.builder().id(1L).build())
                 .build();
     }
 
