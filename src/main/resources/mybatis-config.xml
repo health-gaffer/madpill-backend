@@ -6,9 +6,11 @@
     <typeAliases>
         <typeAlias type="cn.edu.nju.madpill.dto.DrugBriefDTO" alias="DrugBriefDTO"/>
         <typeAlias type="cn.edu.nju.madpill.dto.TagDTO" alias="TagDTO"/>
+        <typeAlias type="cn.edu.nju.madpill.dto.GroupBriefDTO" alias="GroupBriefDTO"/>
         <package name="cn.edu.nju.madpill.domain"/>
     </typeAliases>
     <mappers>
-        <mapper resource="mapping/AssistantMapper.xml"/>
+        <mapper resource="mapping/DrugAssistantMapper.xml"/>
+        <mapper resource="mapping/UserAssistantMapper.xml"/>
     </mappers>
 </configuration>
