@@ -84,7 +84,7 @@ public class TagService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    protected int updateTagsOfDrug(Long drugId, Long[] tagIds) {
+    public int updateTagsOfDrug(Long drugId, Long[] tagIds) {
         drugTagMapper.delete(c -> c.where(drugTag.drugId, isEqualTo(drugId)));
 
         if (tagIds.length == 0) {

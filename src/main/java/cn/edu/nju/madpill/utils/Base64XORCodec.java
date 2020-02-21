@@ -2,7 +2,6 @@ package cn.edu.nju.madpill.utils;
 
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.Base64;
 
 /**
@@ -14,11 +13,14 @@ import java.util.Base64;
 @Component
 public class Base64XORCodec {
 
+    private Base64XORCodec() {
+    }
+
     public static String encrypt(String src, String key) {
         return base64Encode(xorWithKey(src.getBytes(), key.getBytes()));
     }
 
-    public static String decrypt(String src, String key) throws IOException {
+    public static String decrypt(String src, String key) {
         return new String(xorWithKey(base64Decode(src), key.getBytes()));
     }
 
@@ -30,7 +32,7 @@ public class Base64XORCodec {
         return out;
     }
 
-    private static byte[] base64Decode(String s) throws IOException {
+    private static byte[] base64Decode(String s) {
         Base64.Decoder d = Base64.getDecoder();
         return d.decode(s);
     }

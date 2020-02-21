@@ -16,6 +16,9 @@ import static cn.edu.nju.madpill.mapper.TagDynamicSqlSupport.*;
  */
 public final class TagAssistantDynamicSqlSupport {
 
+    private TagAssistantDynamicSqlSupport() {
+    }
+
     public static InsertStatementProvider<Tag> buildInsert(Tag record) {
         return SqlBuilder.insert(record)
                 .into(tag)

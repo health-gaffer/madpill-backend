@@ -91,10 +91,11 @@ public class DrugController {
         }
     }
 
-    @GetMapping(params = {"userId"})
-    public Result getDrugs(@RequestParam("userId") Long userId) {
+    @GetMapping
+    public Result getDrugs(@RequestHeader(name = HEADER_MADPILL_TOKEN_KEY) String token) {
+        User user = userService.getUserByToken(token).orElseThrow(ExceptionSuppliers.INVALID_TOKEN);
         return Result.builder()
-                .data(drugService.getUserDrugs(userId))
+                .data(drugService.getUserDrugs(user.getId()))
                 .code(HttpStatus.OK.value())
                 .build();
     }

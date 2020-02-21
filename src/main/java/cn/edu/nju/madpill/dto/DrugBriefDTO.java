@@ -27,6 +27,8 @@ public class DrugBriefDTO {
 
     private LocalDate expireDate;
 
+    private Long day;
+
     private List<TagDTO> tags;
 
 }

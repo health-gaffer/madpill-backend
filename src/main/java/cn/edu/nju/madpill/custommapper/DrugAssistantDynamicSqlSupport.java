@@ -16,6 +16,9 @@ import static cn.edu.nju.madpill.mapper.DrugDynamicSqlSupport.*;
  */
 public final class DrugAssistantDynamicSqlSupport {
 
+    private DrugAssistantDynamicSqlSupport() {
+    }
+
     public static InsertStatementProvider<Drug> buildInsert(Drug record) {
         return SqlBuilder.insert(record)
                 .into(drug)
