@@ -2,14 +2,13 @@ package cn.edu.nju.madpill.service;
 
 import cn.edu.nju.madpill.custommapper.DrugAssistantMapper;
 import cn.edu.nju.madpill.domain.Drug;
+import cn.edu.nju.madpill.domain.Group;
 import cn.edu.nju.madpill.domain.Tag;
 import cn.edu.nju.madpill.domain.User;
-import cn.edu.nju.madpill.dto.DrugBriefDTO;
-import cn.edu.nju.madpill.dto.DrugDTO;
-import cn.edu.nju.madpill.dto.DrugsListDTO;
-import cn.edu.nju.madpill.dto.TagDTO;
+import cn.edu.nju.madpill.dto.*;
 import cn.edu.nju.madpill.exception.ExceptionSuppliers;
 import cn.edu.nju.madpill.mapper.DrugMapper;
+import cn.edu.nju.madpill.mapper.GroupMapper;
 import cn.edu.nju.madpill.mapper.TagMapper;
 import org.modelmapper.ModelMapper;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
@@ -50,13 +49,15 @@ public class DrugService {
     private final TagService tagService;
     private final DrugMapper drugMapper;
     private final TagMapper tagMapper;
+    private final GroupMapper groupMapper;
     private final DrugAssistantMapper drugAssistantMapper;
     private final ModelMapper modelMapper;
 
-    public DrugService(TagService tagService, DrugMapper drugMapper, TagMapper tagMapper, DrugAssistantMapper drugAssistantMapper, ModelMapper modelMapper) {
+    public DrugService(TagService tagService, DrugMapper drugMapper, TagMapper tagMapper, GroupMapper groupMapper, DrugAssistantMapper drugAssistantMapper, ModelMapper modelMapper) {
         this.tagService = tagService;
         this.drugMapper = drugMapper;
         this.tagMapper = tagMapper;
+        this.groupMapper = groupMapper;
         this.drugAssistantMapper = drugAssistantMapper;
         this.modelMapper = modelMapper;
     }
@@ -66,8 +67,6 @@ public class DrugService {
         Drug newDrug = new Drug();
         modelMapper.map(dto, newDrug);
 
-        // TODO group_id
-        newDrug.setGroupId(1L);
         newDrug.setUserId(curUser.getId());
         drugAssistantMapper.insert(buildInsert(newDrug));
         tagService.updateTagsOfDrug(newDrug.getId(), getTagIdsOfDrug(dto));
@@ -88,13 +87,20 @@ public class DrugService {
                     .render(RenderingStrategies.MYBATIS3);
             List<Tag> tags = tagMapper.selectMany(selectStatement);
 
+            // 标签 tags
             List<TagDTO> tagDTOS = tags.stream().map(tag -> {
                 TagDTO cur = new TagDTO();
                 modelMapper.map(tag, cur);
                 return cur;
             }).collect(Collectors.toList());
-
             drugDTO.setTags(tagDTOS);
+
+            // 群组 group
+            Group curGroup = groupMapper.selectByPrimaryKey(drugInfo.getGroupId()).orElseThrow(ExceptionSuppliers.GROUP_FOREIGNER_KEY_WRONG);
+            GroupBriefDTO groupBriefDTO = new GroupBriefDTO();
+            modelMapper.map(curGroup, groupBriefDTO);
+            drugDTO.setGroup(groupBriefDTO);
+
             return drugDTO;
         } else {
             throw ExceptionSuppliers.PERMISSION_DENIED.get();
@@ -108,8 +114,6 @@ public class DrugService {
             Drug modifiedDrug = new Drug();
             modelMapper.map(dto, modifiedDrug);
 
-            // TODO group_id
-            modifiedDrug.setGroupId(1L);
             modifiedDrug.setUserId(curUser.getId());
             drugMapper.updateByPrimaryKey(modifiedDrug);
             tagService.updateTagsOfDrug(modifiedDrug.getId(), getTagIdsOfDrug(dto));

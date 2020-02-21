@@ -37,5 +37,5 @@ public class DrugDTO {
 
     private List<TagDTO> tags;
 
-    private Long groupId;
+    private GroupBriefDTO group;
 }
