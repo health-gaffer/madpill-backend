@@ -30,6 +30,7 @@ public final class DrugAssistantDynamicSqlSupport {
                 .map(userId).toProperty("userId")
                 .map(indication).toProperty("indication")
                 .map(contraindication).toProperty("contraindication")
+                .map(groupId).toProperty("groupId")
                 .build()
                 .render(RenderingStrategies.MYBATIS3);
     }

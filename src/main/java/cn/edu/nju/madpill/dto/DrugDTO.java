@@ -36,4 +36,6 @@ public class DrugDTO {
     private String contraindication;
 
     private List<TagDTO> tags;
+
+    private Long groupId;
 }
