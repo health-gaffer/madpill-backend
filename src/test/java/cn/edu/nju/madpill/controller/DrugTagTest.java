@@ -1,6 +1,7 @@
 package cn.edu.nju.madpill.controller;
 
 import cn.edu.nju.madpill.dto.DrugDTO;
+import cn.edu.nju.madpill.dto.GroupBriefDTO;
 import cn.edu.nju.madpill.dto.TagDTO;
 import lombok.extern.java.Log;
 import org.junit.jupiter.api.MethodOrderer;
@@ -31,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureJsonTesters
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
-public class DrugTagIntegrationTest {
+public class DrugTagTest {
 
     private static final String HEADER_MADPILL_TOKEN_VALUE = "AlgNG1FZKjpXLSkqPz5cDDw/Cw04CQIGQxAvOU0uFSIcIEc1E10gWS0HLlIPOyI0AiAwWU0=";
     private DrugDTO drugDTO = getDrugDto();
@@ -163,13 +164,27 @@ public class DrugTagIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
-        // 已级联删除标签
+        // 删除标签
         mockMvc.perform(
-                get("/tags")
+                delete("/tags/1")
                         .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").exists())
-                .andExpect(jsonPath("$.data[0].id").doesNotExist());
+                .andExpect(jsonPath("$.code").value(200));
+        mockMvc.perform(
+                delete("/tags/2")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+        mockMvc.perform(
+                delete("/tags/3")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+        mockMvc.perform(
+                delete("/tags/4")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
     }
 
     private TagDTO getTagDto(long tagId) {
@@ -193,6 +208,7 @@ public class DrugTagIntegrationTest {
                 .indication("{\"content\":\"适用症\"}")
                 .contraindication("{\"content\":\"禁忌\"}")
                 .tags(tags)
+                .group(GroupBriefDTO.builder().id(1L).build())
                 .build();
     }
 

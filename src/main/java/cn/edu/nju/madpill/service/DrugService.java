@@ -134,6 +134,7 @@ public class DrugService {
         } else {
             throw ExceptionSuppliers.PERMISSION_DENIED.get();
         }
+
         // 删除 drug_tag 相应记录
         DeleteStatementProvider drugTagDeleteStatement = deleteFrom(drugTag)
                 .where(drugTag.drugId, isEqualTo(drugId))
@@ -149,7 +150,7 @@ public class DrugService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void deleteDrugs(List<Long> selectedDrugsId) {
-        // 删除 drug 中的记录
+        // 删除 drug 中的记录 TODO gcm permission bug
         DeleteStatementProvider drugsDeleteStatement = deleteFrom(drug)
                 .where(drug.id, isIn(selectedDrugsId))
                 .build()

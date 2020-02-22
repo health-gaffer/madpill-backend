@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureJsonTesters
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
-public class DrugControllerIntegrationTest {
+public class DrugControllerTest {
 
     private static final String HEADER_MADPILL_TOKEN_VALUE = "AlgNG1FZKjpXLSkqPz5cDDw/Cw04CQIGQxAvOU0uFSIcIEc1E10gWS0HLlIPOyI0AiAwWU0=";
     @Autowired
@@ -187,7 +187,7 @@ public class DrugControllerIntegrationTest {
     @Test
     @Order(8)
     void testDeleteDrugs() throws Exception {
-        List<Long> selectedDrugsId = Arrays.asList(100L, 119L);
+        List<Long> selectedDrugsId = Arrays.asList(2L, 119L);
         String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(selectedDrugsId);
         System.out.println(json);
         mockMvc.perform(

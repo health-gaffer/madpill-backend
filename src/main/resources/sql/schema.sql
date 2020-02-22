@@ -18,7 +18,7 @@ CREATE TABLE `mp_drug`
     `group_id`         bigint(20)   NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 100000009
+  AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
@@ -47,7 +47,7 @@ CREATE TABLE `mp_group`
     `create_by` bigint(20)   NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 3
+  AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
@@ -62,7 +62,7 @@ CREATE TABLE `mp_tag`
     `user_id` bigint(20)  NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 1002
+  AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
@@ -77,7 +77,7 @@ CREATE TABLE `mp_user`
     `created_at` datetime                                                   NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 20
+  AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
@@ -96,16 +96,6 @@ CREATE TABLE `mp_user_group`
   ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Records of mp_user_group
--- ----------------------------
-BEGIN;
-INSERT INTO `mp_user_group`
-VALUES (12, 1);
-INSERT INTO `mp_user_group`
-VALUES (12, 2);
-COMMIT;
-
--- ----------------------------
 -- Table structure for mp_warehouse
 -- ----------------------------
 DROP TABLE IF EXISTS `mp_warehouse`;
@@ -118,7 +108,7 @@ CREATE TABLE `mp_warehouse`
     `contraindication` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 12
+  AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
