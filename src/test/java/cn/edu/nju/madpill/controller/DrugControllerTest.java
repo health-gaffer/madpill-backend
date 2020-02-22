@@ -2,6 +2,7 @@ package cn.edu.nju.madpill.controller;
 
 import cn.edu.nju.madpill.dto.DrugDTO;
 import cn.edu.nju.madpill.dto.GroupBriefDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.java.Log;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -13,9 +14,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 import static cn.edu.nju.madpill.utils.MadPillConstant.HEADER_MADPILL_TOKEN_KEY;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -27,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureJsonTesters
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@ActiveProfiles("test")
 public class DrugControllerIntegrationTest {
 
     private static final String HEADER_MADPILL_TOKEN_VALUE = "AlgNG1FZKjpXLSkqPz5cDDw/Cw04CQIGQxAvOU0uFSIcIEc1E10gWS0HLlIPOyI0AiAwWU0=";
@@ -35,6 +40,9 @@ public class DrugControllerIntegrationTest {
     private DrugDTO dto = getDto();
     @Autowired
     private JacksonTester<DrugDTO> json;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     @Order(1)
@@ -174,6 +182,28 @@ public class DrugControllerIntegrationTest {
                         .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(500));
+    }
+
+    @Test
+    @Order(8)
+    void testDeleteDrugs() throws Exception {
+        List<Long> selectedDrugsId = Arrays.asList(100L, 119L);
+        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(selectedDrugsId);
+        System.out.println(json);
+        mockMvc.perform(
+                delete("/drugs")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        mockMvc.perform(get("/drugs")
+                .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..expired.length()").value(0))
+                .andExpect(jsonPath("$..expiring.length()").value(0))
+                .andExpect(jsonPath("$..notExpired.length()").value(0));
     }
 
     private DrugDTO getDto() {

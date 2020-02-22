@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureJsonTesters
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@ActiveProfiles("test")
 public class DrugTagIntegrationTest {
 
     private static final String HEADER_MADPILL_TOKEN_VALUE = "AlgNG1FZKjpXLSkqPz5cDDw/Cw04CQIGQxAvOU0uFSIcIEc1E10gWS0HLlIPOyI0AiAwWU0=";
@@ -161,28 +163,13 @@ public class DrugTagIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
-        // 删除标签
+        // 已级联删除标签
         mockMvc.perform(
-                delete("/tags/1")
+                get("/tags")
                         .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200));
-        mockMvc.perform(
-                delete("/tags/2")
-                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200));
-        mockMvc.perform(
-                delete("/tags/3")
-                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200));
-        mockMvc.perform(
-                delete("/tags/4")
-                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200));
-
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data[0].id").doesNotExist());
     }
 
     private TagDTO getTagDto(long tagId) {

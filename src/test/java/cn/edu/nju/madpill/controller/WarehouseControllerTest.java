@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -15,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Log
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class WarehouseControllerIntegrationTest {
 
     @Autowired
@@ -45,9 +47,7 @@ public class WarehouseControllerIntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].name").value("奥硝唑片"))
-                .andExpect(jsonPath("$.data[1].name").value("奥2"))
-                .andExpect(jsonPath("$.data[2].name").value("奥3"))
-                .andExpect(jsonPath("$.data[3].name").value("charles奥4"));
+                .andExpect(jsonPath("$.data[1].name").value("奥2"));
     }
 
     @Test
@@ -55,7 +55,7 @@ public class WarehouseControllerIntegrationTest {
         mockMvc.perform(
                 get("/warehouse")
                         .param("query", "奥")
-                        .param("start", "10000000")
+                        .param("start", "2")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
