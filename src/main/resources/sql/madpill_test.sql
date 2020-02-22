@@ -17,8 +17,7 @@ VALUES (2, '测试奥硝唑片postman', '2020-02-12', '2020-02-19', 'hello',
 -- Records of mp_drug_tag
 -- ----------------------------
 INSERT INTO `mp_drug_tag` (`drug_id`, `tag_id`)
-VALUES (100, 1000),
-       (119, 1001);
+VALUES (100, 1000);
 
 -- ----------------------------
 -- Records of mp_group
