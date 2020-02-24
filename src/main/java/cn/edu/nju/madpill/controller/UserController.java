@@ -4,6 +4,7 @@ import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.edu.nju.madpill.domain.User;
 import cn.edu.nju.madpill.dto.Result;
+import cn.edu.nju.madpill.dto.TagDTO;
 import cn.edu.nju.madpill.exception.ExceptionSuppliers;
 import cn.edu.nju.madpill.service.UserService;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -63,6 +64,20 @@ public class UserController {
         if (curUser.isPresent()) {
             return Result.builder()
                     .data(userService.getGroups(curUser.get()))
+                    .code(HttpStatus.OK.value())
+                    .build();
+        } else {
+            throw ExceptionSuppliers.INVALID_TOKEN.get();
+        }
+    }
+
+    @PostMapping(path = "/groups")
+    public Result createGroup(@RequestHeader(name = HEADER_MADPILL_TOKEN_KEY) String token, @RequestBody String name) {
+        System.out.println(token  + "   " + name);
+        Optional<User> curUser = userService.getUserByToken(token);
+        if (curUser.isPresent()) {
+            return Result.builder()
+                    .data(userService.newGroup(name, curUser.get()))
                     .code(HttpStatus.OK.value())
                     .build();
         } else {

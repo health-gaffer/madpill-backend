@@ -2,20 +2,29 @@ package cn.edu.nju.madpill.service;
 
 import cn.edu.nju.madpill.config.CodecConfig;
 import cn.edu.nju.madpill.custommapper.UserAssistantMapper;
+import cn.edu.nju.madpill.domain.Group;
+import cn.edu.nju.madpill.domain.Tag;
 import cn.edu.nju.madpill.domain.User;
+import cn.edu.nju.madpill.domain.UserGroup;
 import cn.edu.nju.madpill.dto.GroupBriefDTO;
+import cn.edu.nju.madpill.dto.TagDTO;
 import cn.edu.nju.madpill.mapper.UserGroupMapper;
 import cn.edu.nju.madpill.mapper.UserMapper;
 import cn.edu.nju.madpill.utils.Base64XORCodec;
+import org.apache.ibatis.annotations.InsertProvider;
+import org.mybatis.dynamic.sql.insert.render.InsertStatementProvider;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import javax.annotation.Generated;
+import java.time.*;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import static cn.edu.nju.madpill.custommapper.GroupAssistantDynamicSqlSupport.buildInsert;
 import static cn.edu.nju.madpill.mapper.GroupDynamicSqlSupport.group;
 import static cn.edu.nju.madpill.mapper.UserDynamicSqlSupport.user;
 import static cn.edu.nju.madpill.mapper.UserGroupDynamicSqlSupport.userGroup;
@@ -32,13 +41,15 @@ import static org.mybatis.dynamic.sql.SqlBuilder.*;
 public class UserService {
 
     private final UserMapper userMapper;
+    private final UserGroupMapper userGroupMapper;
     private final UserAssistantMapper userAssistantMapper;
 
     private final CodecConfig codecConfig;
 
-    public UserService(UserMapper userMapper, UserAssistantMapper userAssistantMapper, CodecConfig codecConfig) {
+    public UserService(UserMapper userMapper, UserAssistantMapper userAssistantMapper, UserGroupMapper userGroupMapper, CodecConfig codecConfig) {
         this.userMapper = userMapper;
         this.userAssistantMapper = userAssistantMapper;
+        this.userGroupMapper = userGroupMapper;
         this.codecConfig = codecConfig;
     }
 
@@ -97,4 +108,17 @@ public class UserService {
         return userAssistantMapper.selectGroups(selectStatementProvider);
     }
 
+    public Long newGroup(String name, User curUser) {
+        Group group = new Group();
+        group.setCreateAt(LocalDateTime.now(Clock.system(ZoneId.of("Asia/Shanghai"))));
+        group.setCreateBy(curUser.getId());
+        group.setName(name);
+
+        userAssistantMapper.insert(buildInsert(group));
+        UserGroup userGroup = new UserGroup();
+        userGroup.setGroupId(group.getId());
+        userGroup.setUserId(group.getCreateBy());
+        userGroupMapper.insert(userGroup);
+        return group.getId();
+    }
 }
