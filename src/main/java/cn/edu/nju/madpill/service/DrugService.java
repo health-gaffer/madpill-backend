@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static cn.edu.nju.madpill.custommapper.DrugAssistantDynamicSqlSupport.buildInsert;
 import static cn.edu.nju.madpill.mapper.DrugDynamicSqlSupport.drug;
 import static cn.edu.nju.madpill.mapper.DrugTagDynamicSqlSupport.drugTag;
 import static cn.edu.nju.madpill.mapper.TagDynamicSqlSupport.tag;
@@ -72,7 +71,7 @@ public class DrugService {
         modelMapper.map(dto, newDrug);
 
         newDrug.setUserId(curUser.getId());
-        drugAssistantMapper.insert(buildInsert(newDrug));
+        drugMapper.insert(newDrug);
         tagService.updateTagsOfDrug(newDrug.getId(), getTagIdsOfDrug(dto));
     }
 

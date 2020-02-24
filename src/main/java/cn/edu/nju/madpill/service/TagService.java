@@ -1,6 +1,5 @@
 package cn.edu.nju.madpill.service;
 
-import cn.edu.nju.madpill.custommapper.TagAssistantMapper;
 import cn.edu.nju.madpill.domain.DrugTag;
 import cn.edu.nju.madpill.domain.Tag;
 import cn.edu.nju.madpill.dto.TagDTO;
@@ -18,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static cn.edu.nju.madpill.custommapper.TagAssistantDynamicSqlSupport.buildInsert;
 import static cn.edu.nju.madpill.mapper.DrugTagDynamicSqlSupport.drugTag;
 import static cn.edu.nju.madpill.mapper.TagDynamicSqlSupport.tag;
 import static org.mybatis.dynamic.sql.SqlBuilder.*;
@@ -35,13 +33,11 @@ public class TagService {
 
     private final DrugTagMapper drugTagMapper;
     private final TagMapper tagMapper;
-    private final TagAssistantMapper tagAssistantMapper;
     private final ModelMapper modelMapper;
 
-    public TagService(DrugTagMapper drugTagMapper, TagMapper tagMapper, TagAssistantMapper tagAssistantMapper, ModelMapper modelMapper) {
+    public TagService(DrugTagMapper drugTagMapper, TagMapper tagMapper, ModelMapper modelMapper) {
         this.drugTagMapper = drugTagMapper;
         this.tagMapper = tagMapper;
-        this.tagAssistantMapper = tagAssistantMapper;
         this.modelMapper = modelMapper;
     }
 
@@ -79,7 +75,7 @@ public class TagService {
         Tag newTag = new Tag();
         modelMapper.map(dto, newTag);
         newTag.setUserId(userId);
-        tagAssistantMapper.insert(buildInsert(newTag));
+        tagMapper.insert(newTag);
         return newTag.getId();
     }
 

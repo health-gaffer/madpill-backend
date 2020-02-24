@@ -1,6 +1,5 @@
 package cn.edu.nju.madpill.custommapper;
 
-import cn.edu.nju.madpill.domain.Drug;
 import cn.edu.nju.madpill.dto.DrugBriefDTO;
 import org.apache.ibatis.annotations.*;
 import org.mybatis.dynamic.sql.insert.render.InsertStatementProvider;
@@ -18,10 +17,6 @@ import java.util.List;
  */
 @Mapper
 public interface DrugAssistantMapper {
-
-    @InsertProvider(type = SqlProviderAdapter.class, method = "insert")
-    @Options(useGeneratedKeys = true, keyProperty = "record.id")
-    Long insert(InsertStatementProvider<Drug> insertStatement);
 
     @SelectProvider(type = SqlProviderAdapter.class, method = "select")
     @ResultMap("DrugBrief")

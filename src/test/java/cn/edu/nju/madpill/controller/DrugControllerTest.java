@@ -44,6 +44,8 @@ public class DrugControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private final long toAddDrugId = 120;
+
     @Test
     @Order(1)
     void addDrug() throws Exception {
@@ -61,11 +63,11 @@ public class DrugControllerTest {
     @Order(2)
     void testGetDrugDetail() throws Exception {
         mockMvc.perform(
-                get("/drugs/1")
+                get("/drugs/" + toAddDrugId)
                         .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists())
-                .andExpect(jsonPath("$.data.name").value("测试药品1"));
+                .andExpect(jsonPath("$.data.name").value("测试药品" + toAddDrugId));
     }
 
 
@@ -73,20 +75,20 @@ public class DrugControllerTest {
     @Order(3)
     void modifyDrug() throws Exception {
         // 修改
-        dto.setName("测试药品1修改");
+        dto.setName("测试药品" + toAddDrugId + "修改");
         mockMvc.perform(
-                put("/drugs/1")
+                put("/drugs/" + toAddDrugId)
                         .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.write(dto).getJson()))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(
-                get("/drugs/1")
+                get("/drugs/" + toAddDrugId)
                         .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists())
-                .andExpect(jsonPath("$.data.name").value("测试药品1修改"));
+                .andExpect(jsonPath("$.data.name").value("测试药品" + toAddDrugId + "修改"));
     }
 
     @Test
@@ -94,7 +96,7 @@ public class DrugControllerTest {
     void deleteDrug() throws Exception {
         // 删除
         mockMvc.perform(
-                delete("/drugs/1")
+                delete("/drugs/"+toAddDrugId)
                         .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -210,11 +212,10 @@ public class DrugControllerTest {
 
     private DrugDTO getDto() {
         return DrugDTO.builder()
-                .id(1L)
-                .name("测试药品1")
+                .name("测试药品" + toAddDrugId)
                 .producedDate(LocalDate.of(2019, 4, 7))
                 .expireDate(LocalDate.now())
-                .description("测试说明文字1")
+                .description("测试说明文字" + toAddDrugId)
                 .indication("{\"content\":\"适用症\"}")
                 .contraindication("{\"content\":\"禁忌\"}")
                 .group(GroupBriefDTO.builder().id(1L).build())

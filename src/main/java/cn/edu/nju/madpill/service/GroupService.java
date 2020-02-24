@@ -5,6 +5,7 @@ import cn.edu.nju.madpill.domain.Group;
 import cn.edu.nju.madpill.domain.User;
 import cn.edu.nju.madpill.domain.UserGroup;
 import cn.edu.nju.madpill.dto.GroupBriefDTO;
+import cn.edu.nju.madpill.mapper.GroupMapper;
 import cn.edu.nju.madpill.mapper.UserGroupMapper;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
@@ -15,7 +16,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
-import static cn.edu.nju.madpill.custommapper.GroupAssistantDynamicSqlSupport.buildInsert;
 import static cn.edu.nju.madpill.mapper.GroupDynamicSqlSupport.group;
 import static cn.edu.nju.madpill.mapper.UserGroupDynamicSqlSupport.userGroup;
 import static org.mybatis.dynamic.sql.SqlBuilder.*;
@@ -30,10 +30,12 @@ import static org.mybatis.dynamic.sql.SqlBuilder.*;
 @Service
 public class GroupService {
 
+    private final GroupMapper groupMapper;
     private final UserGroupMapper userGroupMapper;
     private final GroupAssistantMapper groupAssistantMapper;
 
-    public GroupService(UserGroupMapper userGroupMapper, GroupAssistantMapper userAssistantMapper) {
+    public GroupService(GroupMapper groupMapper, UserGroupMapper userGroupMapper, GroupAssistantMapper userAssistantMapper) {
+        this.groupMapper = groupMapper;
         this.userGroupMapper = userGroupMapper;
         this.groupAssistantMapper = userAssistantMapper;
     }
@@ -59,7 +61,7 @@ public class GroupService {
         group.setName(name);
         group.setCanDelete(firstGroup);
 
-        groupAssistantMapper.insert(buildInsert(group));
+        groupMapper.insert(group);
         UserGroup userGroup = new UserGroup();
         userGroup.setGroupId(group.getId());
         userGroup.setUserId(group.getCreateBy());

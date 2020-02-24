@@ -46,6 +46,8 @@ public class DrugTagTest {
     @Autowired
     private JacksonTester<DrugDTO> drugJson;
 
+    private final long toAddDrugId = 120;
+
     @Test
     @Order(1)
     void addTag() throws Exception {
@@ -105,7 +107,7 @@ public class DrugTagTest {
     void checkDrugTag() throws Exception {
         // 检查标签
         mockMvc.perform(
-                get("/drugs/1")
+                get("/drugs/" + toAddDrugId)
                         .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists())
@@ -128,7 +130,7 @@ public class DrugTagTest {
 
         drugDTO.setTags(modifiedTags);
         mockMvc.perform(
-                put("/drugs/1")
+                put("/drugs/" + toAddDrugId)
                         .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(drugJson.write(drugDTO).getJson()))
@@ -141,7 +143,7 @@ public class DrugTagTest {
     void checkModifyDrugTag() throws Exception {
         // 检查标签
         mockMvc.perform(
-                get("/drugs/1")
+                get("/drugs/" + toAddDrugId)
                         .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists())
@@ -157,7 +159,7 @@ public class DrugTagTest {
     void deleteDrug() throws Exception {
         // 删除药品
         mockMvc.perform(
-                delete("/drugs/1")
+                delete("/drugs/" + toAddDrugId)
                         .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -200,11 +202,10 @@ public class DrugTagTest {
         tags.add(getTagDto(2));
 
         return DrugDTO.builder()
-                .id(1L)
-                .name("测试药品1")
+                .name("测试药品" + toAddDrugId)
                 .producedDate(LocalDate.of(2019, 4, 7))
                 .expireDate(LocalDate.now())
-                .description("测试说明文字1")
+                .description("测试说明文字" + toAddDrugId)
                 .indication("{\"content\":\"适用症\"}")
                 .contraindication("{\"content\":\"禁忌\"}")
                 .tags(tags)

@@ -16,8 +16,8 @@
         <!-- JDBC连接 -->
         <jdbcConnection
                 driverClass="com.mysql.cj.jdbc.Driver"
-                connectionURL="jdbc:mysql://34.92.23.92:3306/madpill_test?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=CTT"
-                userId="madpill"
+                connectionURL="${mybatis.generator.jdbcURL}"
+                userId="${mybatis.generator.jdbcUserId}"
                 password="${mybatis.generator.jdbcPassword}"
         >
         </jdbcConnection>
@@ -47,7 +47,27 @@
         </javaClientGenerator>
 
         <!-- 配置表信息 -->
-        <table schema="madpill_test" tableName="mp%">
+        <table tableName="mp%">
+            <domainObjectRenamingRule searchString="^Mp" replaceString=""/>
+        </table>
+        <table tableName="mp_drug">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <domainObjectRenamingRule searchString="^Mp" replaceString=""/>
+        </table>
+        <table tableName="mp_group">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <domainObjectRenamingRule searchString="^Mp" replaceString=""/>
+        </table>
+        <table tableName="mp_tap">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <domainObjectRenamingRule searchString="^Mp" replaceString=""/>
+        </table>
+        <table tableName="mp_user">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <domainObjectRenamingRule searchString="^Mp" replaceString=""/>
+        </table>
+        <table tableName="mp_warehouse">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
             <domainObjectRenamingRule searchString="^Mp" replaceString=""/>
         </table>
     </context>
