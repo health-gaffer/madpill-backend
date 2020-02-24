@@ -60,7 +60,7 @@ public class UserService {
             record.setOpenId(openId);
             record.setCreatedAt(LocalDateTime.now());
             userMapper.insert(record);
-            newGroup("我的药箱", record, false);
+            newGroup("我的药箱", getUserByOpenId(openId).get(), false);
         }
     }
 

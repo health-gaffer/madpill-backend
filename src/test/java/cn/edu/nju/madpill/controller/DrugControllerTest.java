@@ -198,7 +198,7 @@ public class DrugControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
-        mockMvc.perform(get("/drugs")
+        mockMvc.perform(get("/drugs?group=1")
                 .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..expired.length()").value(0))
