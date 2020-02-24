@@ -26,13 +26,15 @@ pipeline {
             }
             environment {
                 JASYPT_ENCRYPTOR_PASSWORD = credentials('jasypt-encryptor-password')
-                MYBATIS_GENERATOR_JDBC_PASSWORD = credentials('mysql-madpill-password')
+                MYSQL_PASSWORD = credentials('mysql-madpill-password')
             }
             steps {
                 sh "mvn mybatis-generator:generate -Dmybatis.generator.jdbcURL=jdbc:mysql://34.92.23.92:3306/madpill_test \
                                                    -Dmybatis.generator.jdbcUserId=madpill \
-                                                   -Dmybatis.generator.jdbcPassword='$MYBATIS_GENERATOR_JDBC_PASSWORD'"
-                sh 'mvn clean test -Djasypt.encryptor.password=$JASYPT_ENCRYPTOR_PASSWORD -Dmaven.test.failure.ignore=false'
+                                                   -Dmybatis.generator.jdbcPassword='$MYSQL_PASSWORD'"
+                sh "mvn clean test -Dmysql-username=madpill -Dmysql-password='$MYSQL_PASSWORD' \
+                                   -Djasypt.encryptor.password=$JASYPT_ENCRYPTOR_PASSWORD \
+                                   -Dmaven.test.failure.ignore=false"
                 junit '**/target/surefire-reports/*.xml'
                 stash includes: '**/target/jacoco.exec', name: 'jacoco'
                 stash includes: '**/domain/', name: 'domains'
