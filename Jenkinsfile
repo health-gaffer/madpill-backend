@@ -29,7 +29,9 @@ pipeline {
                 MYBATIS_GENERATOR_JDBC_PASSWORD = credentials('mysql-madpill-password')
             }
             steps {
-                sh 'mvn mybatis-generator:generate -Dmybatis.generator.jdbcURL=jdbc:mysql://34.92.23.92:3306/madpill_test?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=CTT -Dmybatis.generator.jdbcUserId=madpill -Dmybatis.generator.jdbcPassword=$MYBATIS_GENERATOR_JDBC_PASSWORD'
+                sh "mvn mybatis-generator:generate -Dmybatis.generator.jdbcURL=jdbc:mysql://34.92.23.92:3306/madpill_test \
+                                                   -Dmybatis.generator.jdbcUserId=madpill \
+                                                   -Dmybatis.generator.jdbcPassword='$MYBATIS_GENERATOR_JDBC_PASSWORD'"
                 sh 'mvn clean test -Djasypt.encryptor.password=$JASYPT_ENCRYPTOR_PASSWORD -Dmaven.test.failure.ignore=false'
                 junit '**/target/surefire-reports/*.xml'
                 stash includes: '**/target/jacoco.exec', name: 'jacoco'
