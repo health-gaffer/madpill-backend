@@ -46,6 +46,7 @@ CREATE TABLE `mp_group`
     `name`      varchar(255) NOT NULL,
     `create_at` datetime     NOT NULL,
     `create_by` bigint(20)   NOT NULL,
+    `can_delete` bit(1)     NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -90,6 +91,7 @@ CREATE TABLE `mp_user_group`
 (
     `user_id`  bigint(20) NOT NULL,
     `group_id` bigint(20) NOT NULL,
+    `alias`    varchar(255) NOT NULL,
     PRIMARY KEY (`group_id`, `user_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4

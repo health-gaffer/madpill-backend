@@ -165,7 +165,7 @@ public class DrugService {
         drugTagMapper.delete(drugTagDeleteStatement);
     }
 
-    public DrugsListDTO getUserDrugs(Long userId) {
+    public DrugsListDTO getUserDrugs(Long userId, Long groupId) {
         SelectStatementProvider drugsSelectStatement = select(drug.id.as("drug_id"), drug.name.as("drug_name"), drug.expireDate.as("expireDate"),
                 tag.id.as("tag_id"), tag.name.as("tag_name"))
                 .from(user)
@@ -173,6 +173,7 @@ public class DrugService {
                 .leftJoin(drugTag, on(drug.id, equalTo(drugTag.drugId)))
                 .leftJoin(tag, on(drugTag.tagId, equalTo(tag.id)))
                 .where(user.id, isEqualTo(userId))
+                .and(drug.groupId, isEqualTo(groupId))
                 .build()
                 .render(RenderingStrategies.MYBATIS3);
 

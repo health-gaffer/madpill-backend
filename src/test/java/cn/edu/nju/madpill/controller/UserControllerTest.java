@@ -40,7 +40,15 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.data[0].id").value(1))
                 .andExpect(jsonPath("$.data[0].name").value("测试群组1"))
                 .andExpect(jsonPath("$.data[1].id").value(2))
-                .andExpect(jsonPath("$.data[1].name").value("测试群组2"))
-                .andExpect(jsonPath("$.data[2]").doesNotExist());
+                .andExpect(jsonPath("$.data[1].name").value("测试群组2"));
+    }
+    @Test
+    void createGroup() throws Exception {
+        mockMvc.perform(
+                post("/users/groups")
+                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
+                        .content("老家的药箱"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
     }
 }

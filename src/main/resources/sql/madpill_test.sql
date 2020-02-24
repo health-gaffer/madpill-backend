@@ -22,9 +22,9 @@ VALUES (100, 1000);
 -- ----------------------------
 -- Records of mp_group
 -- ----------------------------
-INSERT INTO `mp_group` (`id`, `name`, `create_at`, `create_by`)
-VALUES (1, '测试群组1', '2020-02-21 19:02:14', 12),
-       (2, '测试群组2', '2020-02-21 19:10:30', 12);
+INSERT INTO `mp_group` (`id`, `name`, `create_at`, `create_by`, `can_delete`)
+VALUES (1, '测试群组1', '2020-02-21 19:02:14', 12, false),
+       (2, '测试群组2', '2020-02-21 19:10:30', 12, false);
 
 -- ----------------------------
 -- Records of mp_tag
@@ -46,9 +46,9 @@ VALUES (12, 'o9ik85FW6IYCSR1mXObaTdcb3yCU', '2020-02-18 13:54:29'),
 -- ----------------------------
 BEGIN;
 INSERT INTO `mp_user_group`
-VALUES (12, 1);
+VALUES (12, 1, '办公室');
 INSERT INTO `mp_user_group`
-VALUES (12, 2);
+VALUES (12, 2, '老家');
 COMMIT;
 
 -- ----------------------------
