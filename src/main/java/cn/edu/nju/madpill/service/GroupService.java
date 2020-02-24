@@ -1,6 +1,6 @@
 package cn.edu.nju.madpill.service;
 
-import cn.edu.nju.madpill.custommapper.UserAssistantMapper;
+import cn.edu.nju.madpill.custommapper.GroupAssistantMapper;
 import cn.edu.nju.madpill.domain.Group;
 import cn.edu.nju.madpill.domain.User;
 import cn.edu.nju.madpill.domain.UserGroup;
@@ -19,7 +19,6 @@ import static cn.edu.nju.madpill.custommapper.GroupAssistantDynamicSqlSupport.bu
 import static cn.edu.nju.madpill.mapper.GroupDynamicSqlSupport.group;
 import static cn.edu.nju.madpill.mapper.UserGroupDynamicSqlSupport.userGroup;
 import static org.mybatis.dynamic.sql.SqlBuilder.*;
-import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 
 /**
  * <p>
@@ -32,11 +31,11 @@ import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 public class GroupService {
 
     private final UserGroupMapper userGroupMapper;
-    private final UserAssistantMapper userAssistantMapper;
+    private final GroupAssistantMapper groupAssistantMapper;
 
-    public GroupService(UserGroupMapper userGroupMapper, UserAssistantMapper userAssistantMapper) {
+    public GroupService(UserGroupMapper userGroupMapper, GroupAssistantMapper userAssistantMapper) {
         this.userGroupMapper = userGroupMapper;
-        this.userAssistantMapper = userAssistantMapper;
+        this.groupAssistantMapper = userAssistantMapper;
     }
 
 
@@ -50,7 +49,7 @@ public class GroupService {
                 .build()
                 .render(RenderingStrategies.MYBATIS3);
 
-        return userAssistantMapper.selectGroups(selectStatementProvider);
+        return groupAssistantMapper.selectGroups(selectStatementProvider);
     }
 
     public Long newGroup(String name, User curUser, boolean firstGroup) {
@@ -60,7 +59,7 @@ public class GroupService {
         group.setName(name);
         group.setCanDelete(firstGroup);
 
-        userAssistantMapper.insert(buildInsert(group));
+        groupAssistantMapper.insert(buildInsert(group));
         UserGroup userGroup = new UserGroup();
         userGroup.setGroupId(group.getId());
         userGroup.setUserId(group.getCreateBy());

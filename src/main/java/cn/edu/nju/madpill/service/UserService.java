@@ -1,6 +1,7 @@
 package cn.edu.nju.madpill.service;
 
 import cn.edu.nju.madpill.config.CodecConfig;
+import cn.edu.nju.madpill.custommapper.UserAssistantMapper;
 import cn.edu.nju.madpill.domain.User;
 import cn.edu.nju.madpill.mapper.UserMapper;
 import cn.edu.nju.madpill.utils.Base64XORCodec;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static cn.edu.nju.madpill.custommapper.UserAssistantDynamicSqlSupport.buildInsert;
 import static cn.edu.nju.madpill.mapper.UserDynamicSqlSupport.user;
 import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 import static org.mybatis.dynamic.sql.SqlBuilder.select;
@@ -29,12 +31,14 @@ public class UserService {
     private final GroupService groupService;
 
     private final UserMapper userMapper;
+    private final UserAssistantMapper userAssistantMapper;
 
     private final CodecConfig codecConfig;
 
-    public UserService(GroupService groupService, UserMapper userMapper, CodecConfig codecConfig) {
+    public UserService(GroupService groupService, UserMapper userMapper, UserAssistantMapper userAssistantMapper, CodecConfig codecConfig) {
         this.groupService = groupService;
         this.userMapper = userMapper;
+        this.userAssistantMapper = userAssistantMapper;
         this.codecConfig = codecConfig;
     }
 
@@ -44,7 +48,7 @@ public class UserService {
             User record = new User();
             record.setOpenId(openId);
             record.setCreatedAt(LocalDateTime.now());
-            userMapper.insert(record);
+            userAssistantMapper.insert(buildInsert(record));
             groupService.newGroup("我的药箱", record, false);
         }
     }
