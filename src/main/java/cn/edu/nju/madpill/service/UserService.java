@@ -60,6 +60,7 @@ public class UserService {
             record.setOpenId(openId);
             record.setCreatedAt(LocalDateTime.now());
             userMapper.insert(record);
+            newGroup("我的药箱", record, false);
         }
     }
 
@@ -108,16 +109,18 @@ public class UserService {
         return userAssistantMapper.selectGroups(selectStatementProvider);
     }
 
-    public Long newGroup(String name, User curUser) {
+    public Long newGroup(String name, User curUser, boolean firstGroup) {
         Group group = new Group();
         group.setCreateAt(LocalDateTime.now(Clock.system(ZoneId.of("Asia/Shanghai"))));
         group.setCreateBy(curUser.getId());
         group.setName(name);
+        group.setCanDelete(firstGroup);
 
         userAssistantMapper.insert(buildInsert(group));
         UserGroup userGroup = new UserGroup();
         userGroup.setGroupId(group.getId());
         userGroup.setUserId(group.getCreateBy());
+        userGroup.setAlias(name);
         userGroupMapper.insert(userGroup);
         return group.getId();
     }

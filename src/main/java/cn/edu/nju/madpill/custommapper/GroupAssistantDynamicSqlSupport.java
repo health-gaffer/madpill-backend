@@ -26,6 +26,7 @@ public final class GroupAssistantDynamicSqlSupport {
                 .map(name).toProperty("name")
                 .map(createAt).toProperty("createAt")
                 .map(createBy).toProperty("createBy")
+                .map(canDelete).toProperty("canDelete")
                 .build()
                 .render(RenderingStrategies.MYBATIS3);
     }

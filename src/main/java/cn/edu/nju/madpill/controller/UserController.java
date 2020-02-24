@@ -77,7 +77,7 @@ public class UserController {
         Optional<User> curUser = userService.getUserByToken(token);
         if (curUser.isPresent()) {
             return Result.builder()
-                    .data(userService.newGroup(name, curUser.get()))
+                    .data(userService.newGroup(name, curUser.get(), false))
                     .code(HttpStatus.OK.value())
                     .build();
         } else {
