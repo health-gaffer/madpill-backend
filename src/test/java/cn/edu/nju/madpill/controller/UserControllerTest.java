@@ -8,10 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static cn.edu.nju.madpill.utils.MadPillConstant.HEADER_MADPILL_TOKEN_KEY;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -21,7 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 class UserControllerTest {
 
-    private static final String HEADER_MADPILL_TOKEN_VALUE = "AlgNG1FZKjpXLSkqPz5cDDw/Cw04CQIGQxAvOU0uFSIcIEc1E10gWS0HLlIPOyI0AiAwWU0=";
     @Autowired
     private MockMvc mockMvc;
 
@@ -29,26 +25,5 @@ class UserControllerTest {
     void login() throws Exception {
         mockMvc.perform(post("/users").content("013xjpFw1oEKWe0AXnIw1h5hFw1xjpFN"))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    void getGroups() throws Exception {
-        mockMvc.perform(
-                get("/users/groups")
-                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].id").value(1))
-                .andExpect(jsonPath("$.data[0].name").value("测试群组1"))
-                .andExpect(jsonPath("$.data[1].id").value(2))
-                .andExpect(jsonPath("$.data[1].name").value("测试群组2"));
-    }
-    @Test
-    void createGroup() throws Exception {
-        mockMvc.perform(
-                post("/users/groups")
-                        .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
-                        .content("老家的药箱"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200));
     }
 }
