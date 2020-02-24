@@ -12,6 +12,7 @@ CREATE TABLE `mp_drug`
     `produced_date`    date         NOT NULL,
     `expire_date`      date         NOT NULL,
     `description`      varchar(255) DEFAULT NULL,
+    `reminders`        text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
     `indication`       text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
     `contraindication` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
     `user_id`          bigint(20)   NOT NULL,

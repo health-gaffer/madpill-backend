@@ -28,6 +28,7 @@ public final class DrugAssistantDynamicSqlSupport {
                 .map(expireDate).toProperty("expireDate")
                 .map(description).toProperty("description")
                 .map(userId).toProperty("userId")
+                .map(reminders).toProperty("reminders")
                 .map(indication).toProperty("indication")
                 .map(contraindication).toProperty("contraindication")
                 .map(groupId).toProperty("groupId")
