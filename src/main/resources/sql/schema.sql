@@ -105,10 +105,24 @@ DROP TABLE IF EXISTS `mp_warehouse`;
 CREATE TABLE `mp_warehouse`
 (
     `id`               bigint(20)   NOT NULL AUTO_INCREMENT,
-    `name`             varchar(255) NOT NULL,
-    `manufacture`      varchar(255) NOT NULL,
-    `indication`       text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
-    `contraindication` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+    `name`             varchar(255) NOT NULL COMMENT '药品名称',
+    `ingredient`       text COMMENT '成份',
+    `character`        text COMMENT '性状',
+    `function`         text COMMENT '功能主治',
+    `indication`       text COMMENT '适应症',
+    `usage`            text COMMENT '用法用量',
+    `adverse_effect`   text COMMENT '不良反应',
+    `contraindication` text COMMENT '禁忌',
+    `warning`          text COMMENT '注意事项',
+    `pregnant`         text COMMENT '孕妇及哺乳期妇女用药',
+    `children`         text COMMENT '儿童用药',
+    `old`              text COMMENT '老年用药',
+    `storage`          text COMMENT '贮藏',
+    `interaction`      text COMMENT '药物相互作用',
+    `overdose`         text COMMENT '药物过量',
+    `packaging`        text COMMENT '包装',
+    `indate`           text COMMENT '有效期',
+    `specification`    text COMMENT '规格',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
