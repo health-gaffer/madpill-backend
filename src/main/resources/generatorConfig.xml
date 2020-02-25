@@ -58,7 +58,7 @@
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
             <domainObjectRenamingRule searchString="^Mp" replaceString=""/>
         </table>
-        <table tableName="mp_tap">
+        <table tableName="mp_tag">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
             <domainObjectRenamingRule searchString="^Mp" replaceString=""/>
         </table>

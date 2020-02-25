@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# 将以下信息改为你本地的信息
+
+export MADPILL_DB=your_madpill_db
+export MYSQL_USER=your_mysql_user
+export MYSQL_PWD=your_mysql_pwd
+
+export JDBC_URL=jdbc:mysql://localhost:3306/${MADPILL_DB}
+
+# 更新本地表结构
+mysql -D${MADPILL_DB} -u${MYSQL_USER} -p${MYSQL_PWD} < ./src/main/resources/sql/schema.sql
+
+# 导入测试数据
+mysql -D${MADPILL_DB} -u${MYSQL_USER} -p${MYSQL_PWD} < ./src/main/resources/sql/madpill_test.sql
+
+# 更新 mapper
+mvn mybatis-generator:generate -Dmybatis.generator.jdbcURL=${JDBC_URL} \
+    -Dmybatis.generator.jdbcUserId=${MYSQL_USER} \
+    -Dmybatis.generator.jdbcPassword=${MYSQL_PWD}

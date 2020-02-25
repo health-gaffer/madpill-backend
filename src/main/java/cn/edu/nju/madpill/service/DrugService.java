@@ -66,13 +66,14 @@ public class DrugService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void createNewDrug(DrugDTO dto, User curUser) {
+    public Long createNewDrug(DrugDTO dto, User curUser) {
         Drug newDrug = new Drug();
         modelMapper.map(dto, newDrug);
 
         newDrug.setUserId(curUser.getId());
         drugMapper.insert(newDrug);
         tagService.updateTagsOfDrug(newDrug.getId(), getTagIdsOfDrug(dto));
+        return newDrug.getId();
     }
 
     public DrugDTO getDrugDetail(Long drugId, User curUser) {

@@ -17,7 +17,10 @@ pipeline {
                 MYSQL_PASSWORD = credentials('mysql-madpill-password')
             }
             steps {
-                sh " mysql -Dmadpill_test -umadpill -p'$MYSQL_PASSWORD' < ./src/main/resources/sql/schema.sql"
+                // 更新表结构
+                sh "mysql -Dmadpill_test -umadpill -p'$MYSQL_PASSWORD' < ./src/main/resources/sql/schema.sql"
+                // 导入测试数据
+                sh "mysql -Dmadpill_test -umadpill -p'$MYSQL_PASSWORD' < ./src/main/resources/sql/madpill_test.sql"
             }
         }
         stage('Test') {
@@ -32,7 +35,7 @@ pipeline {
                 sh "mvn mybatis-generator:generate -Dmybatis.generator.jdbcURL=jdbc:mysql://34.92.23.92:3306/madpill_test \
                                                    -Dmybatis.generator.jdbcUserId=madpill \
                                                    -Dmybatis.generator.jdbcPassword='$MYSQL_PASSWORD'"
-                sh "mvn clean test -Dmysql-username=madpill -Dmysql-password='$MYSQL_PASSWORD' \
+                sh "mvn clean test -Dmysql-ip=34.92.23.92 -Dmysql-username=madpill -Dmysql-password='$MYSQL_PASSWORD' \
                                    -Djasypt.encryptor.password=$JASYPT_ENCRYPTOR_PASSWORD \
                                    -Dmaven.test.failure.ignore=false"
                 junit '**/target/surefire-reports/*.xml'

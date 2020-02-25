@@ -36,15 +36,11 @@ public class DrugController {
     @PostMapping(path = "")
     public Result createNewDrug(@RequestHeader(name = HEADER_MADPILL_TOKEN_KEY) String token,
                                 @RequestBody DrugDTO drugDTO) {
-        Optional<User> curUser = userService.getUserByToken(token);
-        if (curUser.isPresent()) {
-            drugService.createNewDrug(drugDTO, curUser.get());
-            return Result.builder()
-                    .code(HttpStatus.OK.value())
-                    .build();
-        } else {
-            throw ExceptionSuppliers.INVALID_TOKEN.get();
-        }
+        User curUser = userService.getUserByToken(token).orElseThrow(ExceptionSuppliers.INVALID_TOKEN);
+        return Result.builder()
+                .data(drugService.createNewDrug(drugDTO, curUser))
+                .code(HttpStatus.OK.value())
+                .build();
     }
 
     @GetMapping(path = "/{drugId}")

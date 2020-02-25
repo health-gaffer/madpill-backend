@@ -32,7 +32,11 @@ VALUES (1, '测试群组1', '2020-02-21 19:02:14', 12, false),
 INSERT INTO `mp_tag` (`id`, `name`, `user_id`)
 VALUES (101, '头疼', 10086),
        (1000, 'shenmiu_delete_drugs', 14),
-       (1001, 'shenmiu_delete_drugs', 14);
+       (1001, 'shenmiu_delete_drugs', 14),
+       (1002, '测试标签 1', 12),
+       (1003, '测试标签 2', 12),
+       (1004, '测试标签 3', 12),
+       (1005, '测试标签 4', 12);
 
 -- ----------------------------
 -- Records of mp_user

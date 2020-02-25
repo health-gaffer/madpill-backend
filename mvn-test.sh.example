@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+export MYSQL_IP="mysql_ip(localhost or server ip)"
+export MYSQL_USER=your_mysql_user
+export MYSQL_PWD=your_mysql_pwd
+export JASYPT_ENCRYPTOR_PWD=jasypt_encryptory_pwd
+
+mvn clean test -Dmysql-ip=${MYSQL_IP} \
+    -Dmysql-username=${MYSQL_USER} \
+    -Dmysql-password=${MYSQL_PWD} \
+    -Djasypt.encryptor.password=${JASYPT_ENCRYPTOR_PWD} \
+    -Dmaven.test.failure.ignore=false

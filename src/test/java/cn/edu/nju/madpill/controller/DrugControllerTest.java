@@ -191,7 +191,6 @@ public class DrugControllerTest {
     void testDeleteDrugs() throws Exception {
         List<Long> selectedDrugsId = Arrays.asList(2L, 119L);
         String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(selectedDrugsId);
-        System.out.println(json);
         mockMvc.perform(
                 delete("/drugs")
                         .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)

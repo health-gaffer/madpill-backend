@@ -48,3 +48,7 @@ env.sh
 /logs
 /src/main/java/cn/edu/nju/madpill/domain/
 /src/main/java/cn/edu/nju/madpill/mapper/
+
+run*.sh
+mapper-update*.sh
+mvn-test*.sh
