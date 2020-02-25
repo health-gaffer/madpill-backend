@@ -36,7 +36,7 @@ public class TagControllerTest {
     @Autowired
     private JacksonTester<TagDTO> json;
 
-    private final long lastTagId = 1006;
+    private final long lastTagId = 1005;
 
     @Test
     @Order(1)

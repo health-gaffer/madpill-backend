@@ -12,10 +12,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -31,6 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureJsonTesters
 @ActiveProfiles("test")
+@DirtiesContext
+@Transactional
 @Rollback
 public class DrugTagTest {
 
@@ -46,12 +50,9 @@ public class DrugTagTest {
     @Autowired
     private JacksonTester<DrugDTO> drugJson;
 
-    private final long toAddDrugId = 120;
-
-    private final long lastTagId = 1005;
-
     @Test
     void addTag() throws Exception {
+        long lastTagId = 1005;
 
         // 新增标签
         TagDTO dto1 = getTagDto();
@@ -129,10 +130,10 @@ public class DrugTagTest {
         List<TagDTO> tags = Arrays.asList(tag3, tag4);
 
         return DrugDTO.builder()
-                .name("测试药品" + toAddDrugId)
+                .name("新增测试药品")
                 .producedDate(LocalDate.of(2019, 4, 7))
                 .expireDate(LocalDate.now())
-                .description("测试说明文字" + toAddDrugId)
+                .description("测试说明文字")
                 .indication("{\"content\":\"适用症\"}")
                 .contraindication("{\"content\":\"禁忌\"}")
                 .tags(tags)
