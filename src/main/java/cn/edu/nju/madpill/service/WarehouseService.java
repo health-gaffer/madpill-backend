@@ -6,10 +6,10 @@ import cn.edu.nju.madpill.dto.WarehouseDTO;
 import cn.edu.nju.madpill.exception.ExceptionSuppliers;
 import cn.edu.nju.madpill.mapper.WarehouseMapper;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static cn.edu.nju.madpill.mapper.WarehouseDynamicSqlSupport.name;
 import static org.mybatis.dynamic.sql.SqlBuilder.isLike;
@@ -38,9 +38,7 @@ public class WarehouseService {
 
     public WarehouseDTO getWarehouse(Long warehouseId) {
         Warehouse warehouse = warehouseMapper.selectByPrimaryKey(warehouseId).orElseThrow(ExceptionSuppliers.WAREHOUSE_NOT_FOUND);
-        WarehouseDTO dto = new WarehouseDTO();
-        modelMapper.map(warehouse, dto);
-        return dto;
+        return modelMapper.map(warehouse, WarehouseDTO.class);
     }
 
     public List<WarehouseBriefDTO> getWarehouses(String query, long start) {
@@ -50,11 +48,8 @@ public class WarehouseService {
                         .limit(WAREHOUSE_NUM_PER_REQUEST)
                         .offset(start)
         );
-        return warehouses.stream().map(warehouse -> {
-            WarehouseBriefDTO dto = new WarehouseBriefDTO();
-            modelMapper.map(warehouse, dto);
-            return dto;
-        }).collect(Collectors.toList());
+        return modelMapper.map(warehouses, new TypeToken<List<WarehouseBriefDTO>>() {
+        }.getType());
     }
 
 }

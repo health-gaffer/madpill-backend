@@ -19,25 +19,7 @@ import lombok.NoArgsConstructor;
 public class WarehouseDTO {
     private String name;
 
-    private String ingredient;
-
-    private String character;
-
-    private String function;
-
     private String indication;
 
-    private String usage;
-
-    private String adverseEffect;
-
     private String contraindication;
-
-    private String warning;
-
-    private String storage;
-
-    private String indate;
-
-    private String specification;
 }
