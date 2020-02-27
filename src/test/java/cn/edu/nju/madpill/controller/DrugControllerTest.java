@@ -211,6 +211,30 @@ public class DrugControllerTest {
                 .andExpect(jsonPath("$..notExpired.length()").value(0));
     }
 
+    @Test
+    @Order(9)
+    void testBatchChangeGroup() throws Exception {
+        String myToken = "AlgNG1FZKwQsEEk2KCgBAlEcOSI7DwwKMigAH004LyUAWhpcEFApXl9fAC8OJFsdKVowWU0=";
+        List<Long> selectedDrugsId = Arrays.asList(3L, 4L);
+        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(selectedDrugsId);
+        mockMvc.perform(
+                put("/drugs")
+                        .header(HEADER_MADPILL_TOKEN_KEY, myToken)
+                        .param("destGroup", "4")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+        mockMvc.perform(
+                get("/drugs")
+                        .header(HEADER_MADPILL_TOKEN_KEY, myToken)
+                        .param("group", "4"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..expired.length()").value(2))
+                .andExpect(jsonPath("$..expiring.length()").value(0))
+                .andExpect(jsonPath("$..notExpired.length()").value(0));
+    }
+
     private DrugDTO getDto() {
         return DrugDTO.builder()
                 .name("测试药品" + toAddDrugId)

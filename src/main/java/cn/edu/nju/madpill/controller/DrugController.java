@@ -102,4 +102,15 @@ public class DrugController {
                 .code(HttpStatus.OK.value())
                 .build();
     }
+
+    @PutMapping(params = {"destGroup"})
+    public Result batchChangeGroup(@RequestHeader(name = HEADER_MADPILL_TOKEN_KEY) String token,
+                                   @RequestBody List<Long> selectedDrugsId,
+                                   @RequestParam("destGroup") Long destGroup) {
+        userService.getUserByToken(token).orElseThrow(ExceptionSuppliers.INVALID_TOKEN);
+        drugService.batchChangeGroup(selectedDrugsId, destGroup);
+        return Result.builder()
+                .code(HttpStatus.OK.value())
+                .build();
+    }
 }

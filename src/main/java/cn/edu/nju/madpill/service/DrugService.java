@@ -15,6 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.mybatis.dynamic.sql.delete.render.DeleteStatementProvider;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
+import org.mybatis.dynamic.sql.update.render.UpdateStatementProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -207,6 +208,23 @@ public class DrugService {
                 .expiring(dtoMap.getOrDefault("expiring", new ArrayList<>()))
                 .notExpired(dtoMap.getOrDefault("notExpired", new ArrayList<>()))
                 .build();
+    }
+
+    /**
+     * 批量修改药品所属群组
+     *
+     * @param selectedDrugsId 药品 id 列表
+     * @param destGroup       目标群组 id
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void batchChangeGroup(List<Long> selectedDrugsId, Long destGroup) {
+        UpdateStatementProvider batchUpdateStatement = update(drug)
+                .set(drug.groupId).equalTo(destGroup)
+                .where(drug.id, isIn(selectedDrugsId))
+                .build()
+                .render(RenderingStrategies.MYBATIS3);
+
+        drugMapper.update(batchUpdateStatement);
     }
 
     private Long[] getTagIdsOfDrug(DrugDTO dto) {
