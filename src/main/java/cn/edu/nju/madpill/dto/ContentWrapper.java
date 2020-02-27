@@ -6,18 +6,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>
+ * 包装适用症和禁忌
  * <p>
  *
  * @author Charles
- * @date 2020/2/14
+ * @date 2020/2/27
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WarehouseBriefDTO {
-    private Long id;
-
-    private String name;
+public class ContentWrapper {
+    private String content;
 }
