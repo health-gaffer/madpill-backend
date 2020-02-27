@@ -26,11 +26,14 @@ import static org.mybatis.dynamic.sql.SqlBuilder.select;
 @Transactional
 public class UserService {
 
+    private final GroupService groupService;
+
     private final UserMapper userMapper;
 
     private final CodecConfig codecConfig;
 
-    public UserService(UserMapper userMapper, CodecConfig codecConfig) {
+    public UserService(GroupService groupService, UserMapper userMapper, CodecConfig codecConfig) {
+        this.groupService = groupService;
         this.userMapper = userMapper;
         this.codecConfig = codecConfig;
     }
@@ -42,6 +45,7 @@ public class UserService {
             record.setOpenId(openId);
             record.setCreatedAt(LocalDateTime.now());
             userMapper.insert(record);
+            groupService.newGroup("我的药箱", record, false);
         }
     }
 
@@ -76,5 +80,4 @@ public class UserService {
             throw new IllegalArgumentException("Invalid token.");
         }
     }
-
 }

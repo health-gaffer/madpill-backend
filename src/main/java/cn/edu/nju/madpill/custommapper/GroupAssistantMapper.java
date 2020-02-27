@@ -1,6 +1,6 @@
 package cn.edu.nju.madpill.custommapper;
 
-import cn.edu.nju.madpill.dto.DrugBriefDTO;
+import cn.edu.nju.madpill.dto.GroupBriefDTO;
 import org.apache.ibatis.annotations.*;
 import org.mybatis.dynamic.sql.insert.render.InsertStatementProvider;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
@@ -12,13 +12,14 @@ import java.util.List;
  * <p>
  * <p>
  *
- * @author Shenmiu
- * @date 2020/2/7
+ * @author Charles
+ * @date 2020/2/21
  */
 @Mapper
-public interface DrugAssistantMapper {
+public interface GroupAssistantMapper {
 
     @SelectProvider(type = SqlProviderAdapter.class, method = "select")
-    @ResultMap("DrugBrief")
-    List<DrugBriefDTO> selectDrugs(SelectStatementProvider selectStatement);
+    @ResultMap("GroupBrief")
+    List<GroupBriefDTO> selectGroups(SelectStatementProvider selectStatement);
+
 }

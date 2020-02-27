@@ -19,4 +19,5 @@ public class ExceptionSuppliers {
     public static final Supplier<BaseException> TAG_NOT_FOUND = () -> new BaseException("找不到相关标签", 404);
     public static final Supplier<BaseException> INVALID_TOKEN = () -> new BaseException("token 无效", HttpStatus.UNAUTHORIZED.value());
     public static final Supplier<BaseException> PERMISSION_DENIED = () -> new BaseException("没有相应权限", HttpStatus.FORBIDDEN.value());
+    public static final Supplier<BaseException> GROUP_FOREIGNER_KEY_WRONG = () -> new BaseException("群组外键错误", 500);
 }

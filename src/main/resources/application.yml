@@ -1,8 +1,17 @@
 spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 3
+      maximum-pool-size: 10
+      max-lifetime: 30000
+      connection-test-query: SELECT 1
   profiles:
     active: dev
 server:
   port: 8081
+mybatis:
+  config-location: classpath:mybatis-config.xml
 logging:
   config: classpath:logging-config.xml
 wechat:
@@ -10,3 +19,7 @@ wechat:
   appsecret: ENC(eaX7vN3Dlv1BA59OSDJO2PfJWEZy2/U4RFNbwBOSoRqABVpXppo0VYAF592zJ+r9)
 codec:
   key: ENC(jbhMK4xYOe+JlQ1r7qjxPQ==)
+jasypt:
+  encryptor:
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator

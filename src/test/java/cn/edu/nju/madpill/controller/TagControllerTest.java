@@ -12,6 +12,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static cn.edu.nju.madpill.utils.MadPillConstant.HEADER_MADPILL_TOKEN_KEY;
@@ -25,6 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureJsonTesters
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@ActiveProfiles("test")
+@DirtiesContext
 public class TagControllerTest {
     private static final String HEADER_MADPILL_TOKEN_VALUE = "AlgNG1FZKjpXLSkqPz5cDDw/Cw04CQIGQxAvOU0uFSIcIEc1E10gWS0HLlIPOyI0AiAwWU0=";
 
@@ -34,11 +38,13 @@ public class TagControllerTest {
     @Autowired
     private JacksonTester<TagDTO> json;
 
+    private final long lastTagId = 1005;
+
     @Test
     @Order(1)
     void testAddTag() throws Exception {
         // 新增
-        TagDTO dto = TagDTO.builder().id(110L).name("感冒").build();
+        TagDTO dto = TagDTO.builder().name("感冒").build();
 
         mockMvc.perform(
                 post("/tags")
@@ -46,7 +52,7 @@ public class TagControllerTest {
                         .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE)
                         .content(json.write(dto).getJson()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").value(110))
+                .andExpect(jsonPath("$.data").value(lastTagId + 1))
                 .andExpect(jsonPath("$.code").value(200));
     }
 
@@ -68,7 +74,7 @@ public class TagControllerTest {
     void testDeleteTag() throws Exception {
         // 删除
         mockMvc.perform(
-                delete("/tags/110")
+                delete("/tags/" + (lastTagId + 1))
                         .header(HEADER_MADPILL_TOKEN_KEY, HEADER_MADPILL_TOKEN_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));

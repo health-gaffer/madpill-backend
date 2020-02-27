@@ -1,10 +1,5 @@
 spring:
-  jpa:
-    show-sql: false
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/madpill?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=CTT
-    username: madpill
-    password: ENC(ypVxSulVJlDmkk4nO6kGLeC3XnDljnNX)
-
-
+    url: jdbc:mysql://${mysql-ip:34.92.23.92}:3306/${mysql-database:madpill}?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=CTT
+    username: ${mysql-username:madpill}
+    password: ${mysql-password:ENC(ypVxSulVJlDmkk4nO6kGLeC3XnDljnNX)}

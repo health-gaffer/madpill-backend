@@ -2,18 +2,20 @@ package cn.edu.nju.madpill.service;
 
 import cn.edu.nju.madpill.custommapper.DrugAssistantMapper;
 import cn.edu.nju.madpill.domain.Drug;
+import cn.edu.nju.madpill.domain.Group;
 import cn.edu.nju.madpill.domain.Tag;
 import cn.edu.nju.madpill.domain.User;
-import cn.edu.nju.madpill.dto.DrugBriefDTO;
-import cn.edu.nju.madpill.dto.DrugDTO;
-import cn.edu.nju.madpill.dto.DrugsListDTO;
-import cn.edu.nju.madpill.dto.TagDTO;
+import cn.edu.nju.madpill.dto.*;
 import cn.edu.nju.madpill.exception.ExceptionSuppliers;
 import cn.edu.nju.madpill.mapper.DrugMapper;
+import cn.edu.nju.madpill.mapper.DrugTagMapper;
+import cn.edu.nju.madpill.mapper.GroupMapper;
 import cn.edu.nju.madpill.mapper.TagMapper;
 import org.modelmapper.ModelMapper;
+import org.mybatis.dynamic.sql.delete.render.DeleteStatementProvider;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
+import org.mybatis.dynamic.sql.update.render.UpdateStatementProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static cn.edu.nju.madpill.custommapper.DrugAssistantDynamicSqlSupport.buildInsert;
 import static cn.edu.nju.madpill.mapper.DrugDynamicSqlSupport.drug;
 import static cn.edu.nju.madpill.mapper.DrugTagDynamicSqlSupport.drugTag;
 import static cn.edu.nju.madpill.mapper.TagDynamicSqlSupport.tag;
@@ -49,26 +50,31 @@ public class DrugService {
 
     private final TagService tagService;
     private final DrugMapper drugMapper;
+    private final DrugTagMapper drugTagMapper;
     private final TagMapper tagMapper;
+    private final GroupMapper groupMapper;
     private final DrugAssistantMapper drugAssistantMapper;
     private final ModelMapper modelMapper;
 
-    public DrugService(TagService tagService, DrugMapper drugMapper, TagMapper tagMapper, DrugAssistantMapper drugAssistantMapper, ModelMapper modelMapper) {
+    public DrugService(TagService tagService, DrugMapper drugMapper, DrugTagMapper drugTagMapper, TagMapper tagMapper, GroupMapper groupMapper, DrugAssistantMapper drugAssistantMapper, ModelMapper modelMapper) {
         this.tagService = tagService;
         this.drugMapper = drugMapper;
+        this.drugTagMapper = drugTagMapper;
         this.tagMapper = tagMapper;
+        this.groupMapper = groupMapper;
         this.drugAssistantMapper = drugAssistantMapper;
         this.modelMapper = modelMapper;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void createNewDrug(DrugDTO dto, User curUser) {
+    public Long createNewDrug(DrugDTO dto, User curUser) {
         Drug newDrug = new Drug();
         modelMapper.map(dto, newDrug);
 
         newDrug.setUserId(curUser.getId());
-        drugAssistantMapper.insert(buildInsert(newDrug));
+        drugMapper.insert(newDrug);
         tagService.updateTagsOfDrug(newDrug.getId(), getTagIdsOfDrug(dto));
+        return newDrug.getId();
     }
 
     public DrugDTO getDrugDetail(Long drugId, User curUser) {
@@ -86,13 +92,20 @@ public class DrugService {
                     .render(RenderingStrategies.MYBATIS3);
             List<Tag> tags = tagMapper.selectMany(selectStatement);
 
+            // 标签 tags
             List<TagDTO> tagDTOS = tags.stream().map(tag -> {
                 TagDTO cur = new TagDTO();
                 modelMapper.map(tag, cur);
                 return cur;
             }).collect(Collectors.toList());
-
             drugDTO.setTags(tagDTOS);
+
+            // 群组 group
+            Group curGroup = groupMapper.selectByPrimaryKey(drugInfo.getGroupId()).orElseThrow(ExceptionSuppliers.GROUP_FOREIGNER_KEY_WRONG);
+            GroupBriefDTO groupBriefDTO = new GroupBriefDTO();
+            modelMapper.map(curGroup, groupBriefDTO);
+            drugDTO.setGroup(groupBriefDTO);
+
             return drugDTO;
         } else {
             throw ExceptionSuppliers.PERMISSION_DENIED.get();
@@ -122,9 +135,38 @@ public class DrugService {
         } else {
             throw ExceptionSuppliers.PERMISSION_DENIED.get();
         }
+
+        // 删除 drug_tag 相应记录
+        DeleteStatementProvider drugTagDeleteStatement = deleteFrom(drugTag)
+                .where(drugTag.drugId, isEqualTo(drugId))
+                .build()
+                .render(RenderingStrategies.MYBATIS3);
+        drugTagMapper.delete(drugTagDeleteStatement);
     }
 
-    public DrugsListDTO getUserDrugs(Long userId) {
+    /**
+     * 批量删除
+     *
+     * @param selectedDrugsId 选择的药品 id 列表
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteDrugs(List<Long> selectedDrugsId) {
+        // 删除 drug 中的记录 TODO gcm permission bug
+        DeleteStatementProvider drugsDeleteStatement = deleteFrom(drug)
+                .where(drug.id, isIn(selectedDrugsId))
+                .build()
+                .render(RenderingStrategies.MYBATIS3);
+        drugMapper.delete(drugsDeleteStatement);
+
+        // 删除 drug_tag 相应记录
+        DeleteStatementProvider drugTagDeleteStatement = deleteFrom(drugTag)
+                .where(drugTag.drugId, isIn(selectedDrugsId))
+                .build()
+                .render(RenderingStrategies.MYBATIS3);
+        drugTagMapper.delete(drugTagDeleteStatement);
+    }
+
+    public DrugsListDTO getUserDrugs(Long userId, Long groupId) {
         SelectStatementProvider drugsSelectStatement = select(drug.id.as("drug_id"), drug.name.as("drug_name"), drug.expireDate.as("expireDate"),
                 tag.id.as("tag_id"), tag.name.as("tag_name"))
                 .from(user)
@@ -132,6 +174,7 @@ public class DrugService {
                 .leftJoin(drugTag, on(drug.id, equalTo(drugTag.drugId)))
                 .leftJoin(tag, on(drugTag.tagId, equalTo(tag.id)))
                 .where(user.id, isEqualTo(userId))
+                .and(drug.groupId, isEqualTo(groupId))
                 .build()
                 .render(RenderingStrategies.MYBATIS3);
 
@@ -165,6 +208,23 @@ public class DrugService {
                 .expiring(dtoMap.getOrDefault("expiring", new ArrayList<>()))
                 .notExpired(dtoMap.getOrDefault("notExpired", new ArrayList<>()))
                 .build();
+    }
+
+    /**
+     * 批量修改药品所属群组
+     *
+     * @param selectedDrugsId 药品 id 列表
+     * @param destGroup       目标群组 id
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void batchChangeGroup(List<Long> selectedDrugsId, Long destGroup) {
+        UpdateStatementProvider batchUpdateStatement = update(drug)
+                .set(drug.groupId).equalTo(destGroup)
+                .where(drug.id, isIn(selectedDrugsId))
+                .build()
+                .render(RenderingStrategies.MYBATIS3);
+
+        drugMapper.update(batchUpdateStatement);
     }
 
     private Long[] getTagIdsOfDrug(DrugDTO dto) {

@@ -7,6 +7,10 @@
 
     <context id="madpill" targetRuntime="MyBatis3DynamicSql">
 
+        <property name="autoDelimitKeywords" value="true"/>
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+
         <!-- 注释 -->
         <commentGenerator>
             <!-- 是否去除自动生成的注释 true: 是, false:否 -->
@@ -16,8 +20,8 @@
         <!-- JDBC连接 -->
         <jdbcConnection
                 driverClass="com.mysql.cj.jdbc.Driver"
-                connectionURL="jdbc:mysql://34.92.23.92:3306/madpill_test?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=CTT"
-                userId="madpill"
+                connectionURL="${mybatis.generator.jdbcURL}"
+                userId="${mybatis.generator.jdbcUserId}"
                 password="${mybatis.generator.jdbcPassword}"
         >
         </jdbcConnection>
@@ -47,10 +51,28 @@
         </javaClientGenerator>
 
         <!-- 配置表信息 -->
-        <table tableName="drug" domainObjectName="Drug"/>
-        <table tableName="user" domainObjectName="User"/>
-        <table tableName="tag" domainObjectName="Tag"/>
-        <table tableName="drug_tag" domainObjectName="DrugTag"/>
-        <table tableName="warehouse" domainObjectName="Warehouse"/>
+        <table tableName="mp%">
+            <domainObjectRenamingRule searchString="^Mp" replaceString=""/>
+        </table>
+        <table tableName="mp_drug">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <domainObjectRenamingRule searchString="^Mp" replaceString=""/>
+        </table>
+        <table tableName="mp_group">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <domainObjectRenamingRule searchString="^Mp" replaceString=""/>
+        </table>
+        <table tableName="mp_tag">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <domainObjectRenamingRule searchString="^Mp" replaceString=""/>
+        </table>
+        <table tableName="mp_user">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <domainObjectRenamingRule searchString="^Mp" replaceString=""/>
+        </table>
+        <table tableName="mp_warehouse">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <domainObjectRenamingRule searchString="^Mp" replaceString=""/>
+        </table>
     </context>
 </generatorConfiguration>

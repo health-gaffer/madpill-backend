@@ -31,9 +31,13 @@ public class DrugDTO {
 
     private String description;
 
+    private String reminders;
+
     private String indication;
 
     private String contraindication;
 
     private List<TagDTO> tags;
+
+    private GroupBriefDTO group;
 }
