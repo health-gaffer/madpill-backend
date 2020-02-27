@@ -11,7 +11,7 @@ else
     kill -9 "$TEMP_PID"
 fi
 
-nohup java -Dspring.profiles.active=prod -Djasypt.encryptor.password="$JASYPT_ENCRYPTOR_PASSWORD" -jar madpill-backend-0.0.1-SNAPSHOT.jar < /dev/null > /dev/null 2>&1 &
+nohup java -Dspring.profiles.active=prod -Djasypt.encryptor.password=${JASYPT_ENCRYPTOR_PASSWORD} -jar madpill-backend-0.0.1-SNAPSHOT.jar < /dev/null > /dev/null 2>&1 &
 echo "[ madpill backend started ]"
 
 exit 0
