@@ -7,6 +7,10 @@
 
     <context id="madpill" targetRuntime="MyBatis3DynamicSql">
 
+        <property name="autoDelimitKeywords" value="true"/>
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+
         <!-- 注释 -->
         <commentGenerator>
             <!-- 是否去除自动生成的注释 true: 是, false:否 -->
