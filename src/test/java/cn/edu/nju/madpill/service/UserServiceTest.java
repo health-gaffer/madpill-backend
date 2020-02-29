@@ -22,8 +22,15 @@ class UserServiceTest {
     UserService tested;
 
     @Test
-    void addUserIfAbsent() {
+    void testAddUserIfAbsent() {
         String openId = "open_id_for_test";
         tested.addUserIfAbsent(openId);
+    }
+
+    @Test
+    void testSelectUserByOpenId() {
+        String openId = "open_id_for_test";
+        tested.addUserIfAbsent(openId);
+        tested.getUserByOpenId("open_id_for_test");
     }
 }
