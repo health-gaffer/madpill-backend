@@ -4,7 +4,9 @@ import cn.edu.nju.madpill.domain.Warehouse;
 import cn.edu.nju.madpill.dto.ContentWrapper;
 import cn.edu.nju.madpill.dto.WarehouseDTO;
 import com.alibaba.fastjson.JSON;
-import org.modelmapper.*;
+import org.modelmapper.AbstractConverter;
+import org.modelmapper.Converter;
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -19,13 +21,6 @@ import org.springframework.context.annotation.Scope;
 @Configuration
 public class ModelMapperConfig {
 
-    private Provider<WarehouseDTO> WarehouseDTOProvider = new AbstractProvider<WarehouseDTO>() {
-        @Override
-        public WarehouseDTO get() {
-            return WarehouseDTO.builder().build();
-        }
-    };
-
     private Converter<Warehouse, WarehouseDTO> warehouseWarehouseDTOConverter = new AbstractConverter<Warehouse, WarehouseDTO>() {
         @Override
         protected WarehouseDTO convert(Warehouse warehouse) {
@@ -37,6 +32,9 @@ public class ModelMapperConfig {
         }
     };
 
+    /**
+     * 将内容包装为 JSON 字符串
+     */
     private String wrap(String toWrap) {
         ContentWrapper wrapper;
         if (null == toWrap) {
@@ -51,10 +49,7 @@ public class ModelMapperConfig {
     @Scope("singleton")
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
-
-        mapper.createTypeMap(Warehouse.class, WarehouseDTO.class);
         mapper.addConverter(warehouseWarehouseDTOConverter);
-        mapper.getTypeMap(Warehouse.class, WarehouseDTO.class).setProvider(WarehouseDTOProvider);
         return mapper;
     }
 }
