@@ -83,6 +83,8 @@ CREATE TABLE `mp_user`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
+CREATE INDEX open_id_idx on mp_user(open_id);
+
 -- ----------------------------
 -- Table structure for mp_user_group
 -- ----------------------------
