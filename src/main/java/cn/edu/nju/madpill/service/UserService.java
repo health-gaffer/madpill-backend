@@ -1,6 +1,7 @@
 package cn.edu.nju.madpill.service;
 
 import cn.edu.nju.madpill.config.CodecConfig;
+import cn.edu.nju.madpill.custommapper.UserAssistantMapper;
 import cn.edu.nju.madpill.domain.User;
 import cn.edu.nju.madpill.mapper.UserMapper;
 import cn.edu.nju.madpill.utils.Base64XORCodec;
@@ -9,7 +10,9 @@ import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static cn.edu.nju.madpill.mapper.UserDynamicSqlSupport.user;
@@ -30,11 +33,14 @@ public class UserService {
 
     private final UserMapper userMapper;
 
+    private final UserAssistantMapper userAssistantMapper;
+
     private final CodecConfig codecConfig;
 
-    public UserService(GroupService groupService, UserMapper userMapper, CodecConfig codecConfig) {
+    public UserService(GroupService groupService, UserMapper userMapper, UserAssistantMapper userAssistantMapper, CodecConfig codecConfig) {
         this.groupService = groupService;
         this.userMapper = userMapper;
+        this.userAssistantMapper = userAssistantMapper;
         this.codecConfig = codecConfig;
     }
 
@@ -59,12 +65,12 @@ public class UserService {
     }
 
     public Optional<User> getUserByOpenId(String openId) {
-        SelectStatementProvider selectStatement = select(user.id, user.openId)
-                .from(user)
-                .where(user.openId, isEqualTo(openId))
-                .build()
-                .render(RenderingStrategies.MYBATIS3);
-        return userMapper.selectOne(selectStatement);
+        List<User> users =  userAssistantMapper.selectUserByOpenId(openId);
+        if (users.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(users.get(0));
+        }
     }
 
     public String generateToken(String openId, String sessionKey) {
