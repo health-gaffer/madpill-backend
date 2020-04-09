@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Scope;
 @Configuration
 public class ModelMapperConfig {
 
-    private Provider<WarehouseDTO> WarehouseDTOProvider = new AbstractProvider<WarehouseDTO>() {
+    private Provider<WarehouseDTO> WarehouseDtoProvider = new AbstractProvider<WarehouseDTO>() {
         @Override
         public WarehouseDTO get() {
             return WarehouseDTO.builder().build();
@@ -54,7 +54,7 @@ public class ModelMapperConfig {
 
         mapper.createTypeMap(Warehouse.class, WarehouseDTO.class);
         mapper.addConverter(warehouseWarehouseDTOConverter);
-        mapper.getTypeMap(Warehouse.class, WarehouseDTO.class).setProvider(WarehouseDTOProvider);
+        mapper.getTypeMap(Warehouse.class, WarehouseDTO.class).setProvider(WarehouseDtoProvider);
         return mapper;
     }
 }
