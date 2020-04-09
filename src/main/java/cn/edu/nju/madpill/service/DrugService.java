@@ -11,6 +11,7 @@ import cn.edu.nju.madpill.mapper.DrugMapper;
 import cn.edu.nju.madpill.mapper.DrugTagMapper;
 import cn.edu.nju.madpill.mapper.GroupMapper;
 import cn.edu.nju.madpill.mapper.TagMapper;
+import cn.edu.nju.madpill.utils.MadPillConstant;
 import org.modelmapper.ModelMapper;
 import org.mybatis.dynamic.sql.delete.render.DeleteStatementProvider;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static cn.edu.nju.madpill.mapper.DrugDynamicSqlSupport.drug;
@@ -42,6 +44,8 @@ import static org.mybatis.dynamic.sql.SqlBuilder.*;
  */
 @Service
 public class DrugService {
+
+    private static final Logger DRUG_LOGGER = Logger.getLogger(DrugService.class.getName());
 
     /**
      * 默认需要提醒的即将过期的时间
@@ -183,30 +187,30 @@ public class DrugService {
         final LocalDate today = LocalDate.now();
         dtos.forEach(dto -> {
             if (today.isAfter(dto.getExpireDate())) {
-                System.out.println("expired");
+                DRUG_LOGGER.fine(MadPillConstant.MadPillStatus.EXPIRED);
                 dto.setDay(dto.getExpireDate().until(today, ChronoUnit.DAYS));
             } else if (today.plusDays(EXPIRING_DAY).isAfter(dto.getExpireDate())) {
-                System.out.println("expiring");
+                DRUG_LOGGER.fine(MadPillConstant.MadPillStatus.EXPIRING);
                 dto.setDay(today.until(dto.getExpireDate(), ChronoUnit.DAYS) + 1);
             } else {
-                System.out.println("notExpired");
+                DRUG_LOGGER.fine(MadPillConstant.MadPillStatus.NOT_EXPIRED);
             }
         });
 
         Map<String, List<DrugBriefDTO>> dtoMap = dtos.stream()
                 .collect(Collectors.groupingBy(dto -> {
                     if (today.isAfter(dto.getExpireDate())) {
-                        return "expired";
+                        return MadPillConstant.MadPillStatus.EXPIRED;
                     } else if (today.plusDays(EXPIRING_DAY).isAfter(dto.getExpireDate())) {
-                        return "expiring";
+                        return MadPillConstant.MadPillStatus.EXPIRING;
                     } else {
-                        return "notExpired";
+                        return MadPillConstant.MadPillStatus.NOT_EXPIRED;
                     }
                 }));
         return DrugsListDTO.builder()
-                .expired(dtoMap.getOrDefault("expired", new ArrayList<>()))
-                .expiring(dtoMap.getOrDefault("expiring", new ArrayList<>()))
-                .notExpired(dtoMap.getOrDefault("notExpired", new ArrayList<>()))
+                .expired(dtoMap.getOrDefault(MadPillConstant.MadPillStatus.EXPIRED, new ArrayList<>()))
+                .expiring(dtoMap.getOrDefault(MadPillConstant.MadPillStatus.EXPIRING, new ArrayList<>()))
+                .notExpired(dtoMap.getOrDefault(MadPillConstant.MadPillStatus.NOT_EXPIRED, new ArrayList<>()))
                 .build();
     }
 

@@ -10,4 +10,10 @@ public final class MadPillConstant {
 
     private MadPillConstant() {
     }
+
+    public final class MadPillStatus {
+        public static final String EXPIRED = "expired";
+        public static final String NOT_EXPIRED = "notExpired";
+        public static final String EXPIRING = "expiring";
+    }
 }

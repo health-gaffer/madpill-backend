@@ -35,17 +35,17 @@ public class ModelMapperConfig {
                     .contraindication(wrap(warehouse.getContraindication()))
                     .build();
         }
-    };
 
-    private String wrap(String toWrap) {
-        ContentWrapper wrapper;
-        if (null == toWrap) {
-            wrapper = new ContentWrapper("");
-        } else {
-            wrapper = new ContentWrapper(toWrap);
+        private String wrap(String toWrap) {
+            ContentWrapper wrapper;
+            if (null == toWrap) {
+                wrapper = new ContentWrapper("");
+            } else {
+                wrapper = new ContentWrapper(toWrap);
+            }
+            return JSON.toJSONString(wrapper);
         }
-        return JSON.toJSONString(wrapper);
-    }
+    };
 
     @Bean
     @Scope("singleton")

@@ -5,19 +5,12 @@ import cn.edu.nju.madpill.custommapper.UserAssistantMapper;
 import cn.edu.nju.madpill.domain.User;
 import cn.edu.nju.madpill.mapper.UserMapper;
 import cn.edu.nju.madpill.utils.Base64XORCodec;
-import org.mybatis.dynamic.sql.render.RenderingStrategies;
-import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
-import static cn.edu.nju.madpill.mapper.UserDynamicSqlSupport.user;
-import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
-import static org.mybatis.dynamic.sql.SqlBuilder.select;
 
 /**
  * @author Aneureka
@@ -65,7 +58,7 @@ public class UserService {
     }
 
     public Optional<User> getUserByOpenId(String openId) {
-        List<User> users =  userAssistantMapper.selectUserByOpenId(openId);
+        List<User> users = userAssistantMapper.selectUserByOpenId(openId);
         if (users.isEmpty()) {
             return Optional.empty();
         } else {

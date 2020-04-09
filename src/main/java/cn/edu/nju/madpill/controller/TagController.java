@@ -72,13 +72,4 @@ public class TagController {
             throw ExceptionSuppliers.INVALID_TOKEN.get();
         }
     }
-
-
-//    @PostMapping(params = "/updateDrugTag")
-//    public Result updateTagsOfDrug(@RequestParam("drugId") Long drugId, @RequestParam("drugId") Long[] tagIds) {
-//        return Result.builder()
-//                .data(tagService.updateTagsOfDrug(drugId,tagIds))
-//                .code(HttpStatus.OK.value())
-//                .build();
-//    }
 }

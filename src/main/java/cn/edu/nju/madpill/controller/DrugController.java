@@ -87,8 +87,10 @@ public class DrugController {
     @DeleteMapping
     public Result deleteDrugs(@RequestHeader(name = HEADER_MADPILL_TOKEN_KEY) String token,
                               @RequestBody List<Long> selectedDrugsId) {
-        userService.getUserByToken(token).orElseThrow(ExceptionSuppliers.INVALID_TOKEN);
-        drugService.deleteDrugs(selectedDrugsId);
+        User curUser = userService.getUserByToken(token).orElseThrow(ExceptionSuppliers.INVALID_TOKEN);
+        if (null != curUser) {
+            drugService.deleteDrugs(selectedDrugsId);
+        }
         return Result.builder()
                 .code(HttpStatus.OK.value())
                 .build();
@@ -107,8 +109,10 @@ public class DrugController {
     public Result batchChangeGroup(@RequestHeader(name = HEADER_MADPILL_TOKEN_KEY) String token,
                                    @RequestBody List<Long> selectedDrugsId,
                                    @RequestParam("destGroup") Long destGroup) {
-        userService.getUserByToken(token).orElseThrow(ExceptionSuppliers.INVALID_TOKEN);
-        drugService.batchChangeGroup(selectedDrugsId, destGroup);
+        User curUser = userService.getUserByToken(token).orElseThrow(ExceptionSuppliers.INVALID_TOKEN);
+        if (null != curUser) {
+            drugService.batchChangeGroup(selectedDrugsId, destGroup);
+        }
         return Result.builder()
                 .code(HttpStatus.OK.value())
                 .build();
